@@ -7,9 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7D23935019D60978009B12AB /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D23934F19D60978009B12AB /* Result.swift */; };
 		7D50B47319D3A46600743806 /* OptionKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 7D50B47219D3A46600743806 /* OptionKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7D50B47919D3A46600743806 /* OptionKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D50B46D19D3A46600743806 /* OptionKit.framework */; };
-		7D50B48019D3A46600743806 /* OptionKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D50B47F19D3A46600743806 /* OptionKitTests.swift */; };
+		7D50B48019D3A46600743806 /* CoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D50B47F19D3A46600743806 /* CoreTests.swift */; };
+		7D50B48A19D3A48500743806 /* Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D50B48919D3A48500743806 /* Core.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -23,12 +25,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		7D23934F19D60978009B12AB /* Result.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
 		7D50B46D19D3A46600743806 /* OptionKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = OptionKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7D50B47119D3A46600743806 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7D50B47219D3A46600743806 /* OptionKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OptionKit.h; sourceTree = "<group>"; };
 		7D50B47819D3A46600743806 /* OptionKitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OptionKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7D50B47E19D3A46600743806 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		7D50B47F19D3A46600743806 /* OptionKitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OptionKitTests.swift; sourceTree = "<group>"; };
+		7D50B47F19D3A46600743806 /* CoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreTests.swift; sourceTree = "<group>"; };
+		7D50B48919D3A48500743806 /* Core.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Core.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +77,8 @@
 			children = (
 				7D50B47219D3A46600743806 /* OptionKit.h */,
 				7D50B47019D3A46600743806 /* Supporting Files */,
+				7D50B48919D3A48500743806 /* Core.swift */,
+				7D23934F19D60978009B12AB /* Result.swift */,
 			);
 			path = OptionKit;
 			sourceTree = "<group>";
@@ -88,7 +94,7 @@
 		7D50B47C19D3A46600743806 /* OptionKitTests */ = {
 			isa = PBXGroup;
 			children = (
-				7D50B47F19D3A46600743806 /* OptionKitTests.swift */,
+				7D50B47F19D3A46600743806 /* CoreTests.swift */,
 				7D50B47D19D3A46600743806 /* Supporting Files */,
 			);
 			path = OptionKitTests;
@@ -209,6 +215,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7D23935019D60978009B12AB /* Result.swift in Sources */,
+				7D50B48A19D3A48500743806 /* Core.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -216,7 +224,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7D50B48019D3A46600743806 /* OptionKitTests.swift in Sources */,
+				7D50B48019D3A46600743806 /* CoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -315,6 +323,7 @@
 		7D50B48419D3A46600743806 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -326,12 +335,14 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		7D50B48519D3A46600743806 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -397,6 +408,7 @@
 				7D50B48519D3A46600743806 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		7D50B48619D3A46600743806 /* Build configuration list for PBXNativeTarget "OptionKitTests" */ = {
 			isa = XCConfigurationList;
@@ -405,6 +417,7 @@
 				7D50B48819D3A46600743806 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
