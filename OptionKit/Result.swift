@@ -40,8 +40,18 @@ public enum Result<T> : Printable {
             case .Success(let box):
                 return "{ Success \(box.value) }"
             case .Failure(let err):
-                return "{ Failure \"\(err)\""
+                return "{ Failure \"\(err)\" }"
             }
+        }
+    }
+    
+    public func forcedValue() -> T {
+        switch self {
+        case .Success(let box):
+            return box.value
+        case .Failure(let err):
+            println("Cannot force value of error: \(err)")
+            abort()
         }
     }
 }
@@ -49,10 +59,9 @@ public enum Result<T> : Printable {
 /**
  Sad type that needs to exist because we can't have non-fixed layout enums yet…
  */
-
 public class Box<T> {
     public let value:T
-    init(val:T) {
+    public init(val:T) {
         self.value = val
     }
 }

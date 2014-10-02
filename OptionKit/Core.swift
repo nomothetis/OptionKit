@@ -12,19 +12,24 @@ import Foundation
  Eventually intends to be a getopt-compatible option parser.
  */
 
-enum OptionType {
+public enum OptionTrigger : Equatable {
     case Short(Character)
     case Long(String)
     case Mixed(Character, String)
     
 }
 
-struct OptionDefinition {
-    let type:OptionType
-    let numberOfParameters:Int = 0
+public struct OptionDefinition : Equatable {
+    let trigger:OptionTrigger
+    let numberOfParameters:Int 
+    
+    public init(trigger trig:OptionTrigger, numberOfParameters num:Int = 0) {
+        self.trigger = trig
+        self.numberOfParameters = num
+    }
     
     func matches(str:String) -> Bool {
-        switch self.type {
+        switch self.trigger {
         case .Short(let char):
             return str == "-" + String(char)
         case .Long(let longKey):
@@ -54,15 +59,20 @@ struct OptionDefinition {
     }
 }
 
-struct Option {
+public struct Option : Equatable {
     let definition:OptionDefinition
     let parameters:[String]
+    
+    public init(definition def:OptionDefinition, parameters params:[String] = []) {
+        self.definition = def
+        self.parameters = params
+    }
 }
 
-struct OptionParser {
+public struct OptionParser {
     let flags:[OptionDefinition]
     
-    init(flags:[OptionDefinition]) {
+    public init(flags:[OptionDefinition] = []) {
         self.flags = flags
     }
     
@@ -70,7 +80,17 @@ struct OptionParser {
         return OptionParser(flags: self.flags + [opt])
     }
     
-    func parse(parameters:[String]) -> Result<[Option]> {
+    /// Parses an array of strings for options.
+    ///
+    /// This method is concerned with finding all defined options and all their associated
+    /// parameters. It assumes:
+    ///   - Option syntax ("-a", "--some-option") is reserved for options.
+    ///   - The parameters of an option follow the option.
+    ///
+    /// :param: parameters the parameters passed to the command line utility.
+    ///
+    /// :returns: A result containing either the parsed option or any error encountered.
+    public func parse(parameters:[String]) -> Result<[Option]> {
         let normalizedParams = OptionParser.normalizeParameters(parameters)
         return normalizedParams.reduce(Result.Success(Box(val:[Option]()))) { result, next in
             return result.flatMap {optArray in
@@ -80,37 +100,31 @@ struct OptionParser {
                         let newOption = Option(definition: lastOpt.definition, parameters: lastOpt.parameters + [next])
                         return .Success(Box(val: shortOptArray + [newOption]))
                     } else {
-                        /* Does the next element want to be a flag? */
-                        if OptionDefinition.isValidOptionString(next) {
-                            for flag in self.flags {
-                                if flag.matches(next) {
-                                    let newOption = Option(definition: flag, parameters: [])
-                                    return .Success(Box(val: optArray + [newOption]))
-                                }
-                            }
-                            
-                            return .Failure("Invalid option: \(next)")
-                        }
-                        
-                        return result
+                        return self.parseNewFlagIntoResult(result, flagCandidate: next)
                     }
                 } else {
-                    /* Does the next element want to be a flag? */
-                    if OptionDefinition.isValidOptionString(next) {
-                        for flag in self.flags {
-                            if flag.matches(next) {
-                                let newOption = Option(definition: flag, parameters: [])
-                                return .Success(Box(val: optArray + [newOption]))
-                            }
-                        }
-                        
-                        return .Failure("Invalid option: \(next)")
-                    }
-                    
-                    return result
+                    return self.parseNewFlagIntoResult(result, flagCandidate: next)
                 }
             }
         }
+    }
+    
+    func parseNewFlagIntoResult(current:Result<[Option]>, flagCandidate:String) -> Result<[Option]> {
+            /* Does the next element want to be a flag? */
+            if OptionDefinition.isValidOptionString(flagCandidate) {
+                for flag in self.flags {
+                    if flag.matches(flagCandidate) {
+                        let newOption = Option(definition: flag, parameters: [])
+                        return current.map { val in
+                            return val + [newOption]
+                        }
+                    }
+                }
+                
+                return .Failure("Invalid option: \(flagCandidate)")
+            }
+            
+            return current
     }
     
     static func normalizeParameters(parameters:[String]) -> [String] {
@@ -128,7 +142,7 @@ struct OptionParser {
             
             /* Okay, we have one or more single-character flags. */
             var params = [String]()
-            for char in next[next.startIndex..<advance(next.startIndex, 2)] {
+            for char in next[secondIndex..<advance(next.startIndex, 2)] {
                 params += ["-\(char)"]
             }
             
@@ -137,3 +151,27 @@ struct OptionParser {
         
     }
 }
+
+/// MARK: - Equatable
+public func ==(lhs:OptionTrigger, rhs:OptionTrigger) -> Bool {
+    switch (lhs, rhs) {
+    case (.Short(let x), .Short(let y)):
+            return x == y
+    case (.Long(let x), .Long(let y)):
+        return x == y
+    case (.Mixed(let x1, let x2), .Mixed(let y1, let y2)):
+        return (x1 == y1) && (x2 == y2)
+    default:
+        return false
+    }
+}
+
+public func ==(lhs:OptionDefinition, rhs:OptionDefinition) -> Bool {
+    return (lhs.trigger == rhs.trigger) && (lhs.numberOfParameters == rhs.numberOfParameters)
+}
+
+public func ==(lhs:Option, rhs:Option) -> Bool {
+    return (lhs.definition == rhs.definition) && (lhs.parameters == rhs.parameters)
+}
+
+
