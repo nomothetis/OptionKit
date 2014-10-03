@@ -33,9 +33,9 @@ public struct OptionDefinition : Equatable {
         case .Short(let char):
             return str == "-" + String(char)
         case .Long(let longKey):
-            return str == longKey
+            return str == "--" + longKey
         case .Mixed(let char, let longKey):
-            return (str == longKey) || str == "-" + String(char)
+            return (str == "--" + longKey) || str == "-" + String(char)
         }
     }
     
