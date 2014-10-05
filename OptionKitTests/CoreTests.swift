@@ -273,6 +273,8 @@ class OptionKitTests: XCTestCase {
             XCTAssert(true, "Success!")
         }
         
+        // Check that the long option also works.
+        
         params = ["--hello"]
         switch parser.parse(params) {
         case .Success(let opts):
