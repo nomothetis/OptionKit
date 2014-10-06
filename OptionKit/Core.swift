@@ -12,14 +12,26 @@ import Foundation
  Eventually intends to be a getopt-compatible option parser.
  */
 
-public enum OptionTrigger : Equatable {
+public enum OptionTrigger : Equatable, DebugPrintable {
     case Short(Character)
     case Long(String)
     case Mixed(Character, String)
     
+    public var debugDescription:String {
+        get {
+            switch self {
+            case .Short(let c):
+                return "-\(c)"
+            case .Long(let str):
+                return "--\(str)"
+            case .Mixed(let c, let str):
+                return "(-\(c), --\(str))"
+            }
+        }
+    }
 }
 
-public struct OptionDefinition : Equatable {
+public struct OptionDefinition : Equatable, DebugPrintable {
     let trigger:OptionTrigger
     let numberOfParameters:Int 
     
@@ -57,15 +69,33 @@ public struct OptionDefinition : Equatable {
         return str[str.startIndex ... advance(str.startIndex, 1)] == "--"
         
     }
+    
+    public var debugDescription:String {
+        get {
+            return "{ OptionDescription: \(self.trigger), \(self.numberOfParameters) }"
+        }
+    }
 }
 
-public struct Option : Equatable {
+public struct Option : Equatable, DebugPrintable {
     let definition:OptionDefinition
     let parameters:[String]
     
     public init(definition def:OptionDefinition, parameters params:[String] = []) {
         self.definition = def
         self.parameters = params
+    }
+    
+    public var isValid:Bool {
+        get {
+            return parameters.count == definition.numberOfParameters
+        }
+    }
+    
+    public var debugDescription:String {
+        get {
+            return "{ Option:\n    \(self.definition)\n     \(self.parameters)}"
+        }
     }
 }
 
@@ -93,19 +123,49 @@ public struct OptionParser {
     public func parse(parameters:[String]) -> Result<[Option]> {
         let normalizedParams = OptionParser.normalizeParameters(parameters)
         return normalizedParams.reduce(Result.Success(Box(val:[Option]()))) { result, next in
+            
             return result.flatMap {optArray in
+                
+                /* First check if we are in the process of parsing an option with parameters. */
                 if let lastOpt = optArray.last {
-                    if lastOpt.definition.numberOfParameters < lastOpt.parameters.count {
+                    
+                    /* Since we have parsed an option already, let's check if it needs more parameters. */
+                    if lastOpt.definition.numberOfParameters > lastOpt.parameters.count {
+                        
+                        /* The option expects parameters; parameters cannot look like option triggers. */
+                        if (OptionDefinition.isValidOptionString(next)) {
+                            return .Failure("Option \(lastOpt) was not passed the required number of parameters before option \(next) was declared")
+                        }
+                        
+                        /* Sanity prevails, the next element is not an option trigger. */
                         let shortOptArray = optArray[0 ..< optArray.count - 1]
                         let newOption = Option(definition: lastOpt.definition, parameters: lastOpt.parameters + [next])
                         return .Success(Box(val: shortOptArray + [newOption]))
-                    } else {
-                        return self.parseNewFlagIntoResult(result, flagCandidate: next)
                     }
-                } else {
+                    
+                    /* No need for more parameters; parse the next option. */
                     return self.parseNewFlagIntoResult(result, flagCandidate: next)
                 }
+                
+                /* This is the first option. Parse it! */
+                return self.parseNewFlagIntoResult(result, flagCandidate: next)
             }
+        }.flatMap { parsedOptions in
+            
+            // We need to carry out one last check. Because of the way the above reduce works, it's
+            // possible the very last option is in fact not valid. There are ways around that, like
+            // having an array of results and then coalescing it into a single Result array if all
+            // are successes, but that's actually slower than just checking the last element at the
+            // end.
+            if let lastOpt = parsedOptions.last {
+                if lastOpt.isValid {
+                    return .Success(Box(val:parsedOptions))
+                } else {
+                    return .Failure("Option \(lastOpt) is invalid")
+                }
+            }
+            
+            return .Success(Box(val:parsedOptions))
         }
     }
     

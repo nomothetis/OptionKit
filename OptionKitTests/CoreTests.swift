@@ -17,10 +17,14 @@ class OptionKitTests: XCTestCase {
         parser.parse(["--hello"]).map {opts in
             XCTFail("Empty parser should process no options; instead processed: \(opts)")
         }
+        
+        parser.parse(["-h"]).map {opts in
+            XCTFail("Empty parser should process no options; instead processed: \(opts)")
+        }
     }
     
     func testParserWithNoParameterShortOption() {
-        let optionDescription = OptionDefinition(trigger:.Short("h"), numberOfParameters:0)
+        let optionDescription = OptionDefinition(trigger:.Short("h"))
         let parser = OptionParser(flags:[optionDescription])
         let expectedOption = Option(definition:optionDescription)
         
@@ -96,7 +100,7 @@ class OptionKitTests: XCTestCase {
     }
     
     func testInvalidCallsOfNoParamterShortOption() {
-        let optionDescription = OptionDefinition(trigger:.Short("h"), numberOfParameters:0)
+        let optionDescription = OptionDefinition(trigger:.Short("h"))
         let parser = OptionParser(flags:[optionDescription])
         let expectedOption = Option(definition:optionDescription)
         
@@ -111,7 +115,7 @@ class OptionKitTests: XCTestCase {
     
     
     func testParserWithNoParameterLongOption() {
-        let optionDescription = OptionDefinition(trigger:.Long("hello"), numberOfParameters:0)
+        let optionDescription = OptionDefinition(trigger:.Long("hello"))
         let parser = OptionParser(flags:[optionDescription])
         let expectedOption = Option(definition:optionDescription)
         
@@ -200,7 +204,7 @@ class OptionKitTests: XCTestCase {
     }
     
     func testParserWithNoParameterMixedOption() {
-        let optionDescription = OptionDefinition(trigger:.Mixed("h", "hello"), numberOfParameters:0)
+        let optionDescription = OptionDefinition(trigger:.Mixed("h", "hello"))
         let parser = OptionParser(flags:[optionDescription])
         let expectedOption = Option(definition:optionDescription)
         
@@ -327,6 +331,212 @@ class OptionKitTests: XCTestCase {
         case .Failure(let err):
             XCTFail("Parser \(parser) should have properly parsed \(params)")
         }
+    }
+    
+    func testOptionWithParameters() {
+        // One parameter.
+        var optionDescription = OptionDefinition(trigger:.Mixed("h", "hello"), numberOfParameters:1)
+        var parser = OptionParser(flags:[optionDescription])
+        var expectedOption = Option(definition:optionDescription, parameters:["world"])
+        
+        var params = ["-h", "world"]
+        switch parser.parse(params) {
+        case .Success(let opts):
+            XCTAssertEqual(1, opts.value.count, "Parser \(parser) should have parsed \(params)")
+            XCTAssertEqual(opts.value.last!, expectedOption, "Incorrect option parsed.")
+        case .Failure(let err):
+            XCTFail("Parser \(parser) should have properly parsed \(params)")
+        }
+        
+        params = ["--hello", "world"]
+        switch parser.parse(params) {
+        case .Success(let opts):
+            XCTAssertEqual(1, opts.value.count, "Parser \(parser) should have parsed \(params)")
+            XCTAssertEqual(opts.value.last!, expectedOption, "Incorrect option parsed.")
+        case .Failure(let err):
+            XCTFail("Parser \(parser) should have properly parsed \(params)")
+        }
+        
+        params = ["--hello"]
+        switch parser.parse(params) {
+        case .Success(let opts):
+            XCTFail("Parser \(parser) should have generated an error with parameters \(params); instead generated \(opts)")
+        case .Failure(let err):
+            XCTAssert(true, "WTF?")
+        }
+        
+        params = ["--hello", "--world"]
+        switch parser.parse(params) {
+        case .Success(let opts):
+            XCTFail("Parser \(parser) should have generated an error with parameters \(params); instead generated \(opts)")
+        case .Failure(let err):
+            XCTAssert(true, "WTF?")
+        }
+        
+        params = ["--hello", "-w"]
+        switch parser.parse(params) {
+        case .Success(let opts):
+            XCTFail("Parser \(parser) should have generated an error with parameters \(params); instead generated \(opts)")
+        case .Failure(let err):
+            XCTAssert(true, "WTF?")
+        }
+        
+        
+        optionDescription = OptionDefinition(trigger:.Mixed("h", "hello"), numberOfParameters:3)
+        parser = OptionParser(flags:[optionDescription])
+        expectedOption = Option(definition:optionDescription, parameters:["world", "of", "coke"])
+        
+        params = ["-h", "world", "of", "coke"]
+        switch parser.parse(params) {
+        case .Success(let opts):
+            XCTAssertEqual(1, opts.value.count, "Parser \(parser) should have parsed \(params)")
+            XCTAssertEqual(opts.value.last!, expectedOption, "Incorrect option parsed.")
+        case .Failure(let err):
+            XCTFail("Parser \(parser) should have properly parsed \(params)")
+        }
+        
+        params = ["--hello", "world", "of", "coke"]
+        switch parser.parse(params) {
+        case .Success(let opts):
+            XCTAssertEqual(1, opts.value.count, "Parser \(parser) should have parsed \(params)")
+            XCTAssertEqual(opts.value.last!, expectedOption, "Incorrect option parsed.")
+        case .Failure(let err):
+            XCTFail("Parser \(parser) should have properly parsed \(params)")
+        }
+        
+        params = ["--hello"]
+        switch parser.parse(params) {
+        case .Success(let opts):
+            XCTFail("Parser \(parser) should have generated an error with parameters \(params); instead generated \(opts)")
+        case .Failure(let err):
+            XCTAssert(true, "WTF?")
+        }
+        
+        params = ["--hello", "world"]
+        switch parser.parse(params) {
+        case .Success(let opts):
+            XCTFail("Parser \(parser) should have generated an error with parameters \(params); instead generated \(opts)")
+        case .Failure(let err):
+            XCTAssert(true, "WTF?")
+        }
+        
+        params = ["--hello", "world", "of"]
+        switch parser.parse(params) {
+        case .Success(let opts):
+            XCTFail("Parser \(parser) should have generated an error with parameters \(params); instead generated \(opts)")
+        case .Failure(let err):
+            XCTAssert(true, "WTF?")
+        }
+    }
+    
+    
+    func testMixOfParametersAndNoParameters() {
+        var optionDescription = OptionDefinition(trigger:.Mixed("h", "hello"), numberOfParameters:1)
+        var optionDescription2 = OptionDefinition(trigger:.Mixed("p", "pom"))
+        var optionDescription3 = OptionDefinition(trigger:.Mixed("n", "nom"), numberOfParameters:2)
+        var parser = OptionParser(flags:[optionDescription, optionDescription2, optionDescription3])
+        var expectedOption1 = Option(definition:optionDescription, parameters:["world"])
+        var expectedOption2 = Option(definition: optionDescription2)
+        var expectedOption3 = Option(definition: optionDescription3, parameters:["boo", "hoo"])
+        
+        var params = ["--hello", "world", "of"]
+        switch parser.parse(params) {
+        case .Success(let opts):
+            XCTAssertEqual(1, opts.value.count, "Parser \(parser) should have parsed \(params)")
+            XCTAssertEqual(opts.value.last!, expectedOption1, "Incorrect option parsed.")
+        case .Failure(let err):
+            XCTFail("Parser \(parser) should have properly parsed \(params)")
+        }
+        
+        params = ["--hello", "world"]
+        switch parser.parse(params) {
+        case .Success(let opts):
+            XCTAssertEqual(1, opts.value.count, "Parser \(parser) should have parsed \(params)")
+            XCTAssertEqual(opts.value.last!, expectedOption1, "Incorrect option parsed.")
+        case .Failure(let err):
+            XCTFail("Parser \(parser) should have properly parsed \(params)")
+        }
+        
+        params = ["--hello", "world", "-p"]
+        switch parser.parse(params) {
+        case .Success(let opts):
+            XCTAssertEqual(2, opts.value.count, "Parser \(parser) should have parsed \(params)")
+            XCTAssertEqual(opts.value[0], expectedOption1, "Incorrect option parsed.")
+            XCTAssertEqual(opts.value.last!, expectedOption2, "Incorrect option parsed.")
+        case .Failure(let err):
+            XCTFail("Parser \(parser) should have properly parsed \(params)")
+        }
+        
+        params = ["--hello", "world", "-p"]
+        switch parser.parse(params) {
+        case .Success(let opts):
+            XCTAssertEqual(2, opts.value.count, "Parser \(parser) should have parsed \(params)")
+            XCTAssertEqual(opts.value[0], expectedOption1, "Incorrect option parsed.")
+            XCTAssertEqual(opts.value.last!, expectedOption2, "Incorrect option parsed.")
+        case .Failure(let err):
+            XCTFail("Parser \(parser) should have properly parsed \(params)")
+        }
+        
+        params = ["--hello", "world", "-p", "-n", "boo", "hoo"]
+        switch parser.parse(params) {
+        case .Success(let opts):
+            XCTAssertEqual(3, opts.value.count, "Parser \(parser) should have parsed \(params)")
+            XCTAssertEqual(opts.value[0], expectedOption1, "Incorrect option parsed.")
+            XCTAssertEqual(opts.value[1], expectedOption2, "Incorrect option parsed.")
+            XCTAssertEqual(opts.value.last!, expectedOption3, "Incorrect option parsed.")
+        case .Failure(let err):
+            XCTFail("Parser \(parser) should have properly parsed \(params)")
+        }
+        
+        params = ["--hello", "world", "-p", "-n", "boo", "hoo", "rest"]
+        switch parser.parse(params) {
+        case .Success(let opts):
+            XCTAssertEqual(3, opts.value.count, "Parser \(parser) should have parsed \(params)")
+            XCTAssertEqual(opts.value[0], expectedOption1, "Incorrect option parsed.")
+            XCTAssertEqual(opts.value[1], expectedOption2, "Incorrect option parsed.")
+            XCTAssertEqual(opts.value.last!, expectedOption3, "Incorrect option parsed.")
+        case .Failure(let err):
+            XCTFail("Parser \(parser) should have properly parsed \(params)")
+        }
+        
+        // Tests that options can be passed at any time
+        params = ["-p", "-n", "boo", "hoo", "rest", "--hello", "world"]
+        switch parser.parse(params) {
+        case .Success(let opts):
+            XCTAssertEqual(3, opts.value.count, "Parser \(parser) should have parsed \(params)")
+            XCTAssertEqual(opts.value[0], expectedOption2, "Incorrect option parsed.")
+            XCTAssertEqual(opts.value[1], expectedOption3, "Incorrect option parsed.")
+            XCTAssertEqual(opts.value.last!, expectedOption1, "Incorrect option parsed.")
+        case .Failure(let err):
+            XCTFail("Parser \(parser) should have properly parsed \(params)")
+        }
+        
+        
+        // Now test the failure states: times when all the parameters aren't passed.
+        params = ["-p", "-n", "boo", "--hello", "world"]
+        switch parser.parse(params) {
+        case .Success(let opts):
+            XCTFail("Parser \(parser) should have generated an error with parameters \(params)")
+        case .Failure(let err):
+            XCTAssert(true, "WTF?")
+        }
+        
+        params = ["-p", "-n", "boo", "--hello"]
+        switch parser.parse(params) {
+        case .Success(let opts):
+            XCTFail("Parser \(parser) should have generated an error with parameters \(params)")
+        case .Failure(let err):
+            XCTAssert(true, "WTF?")
+        }
+        
+        params = ["-n", "boo", "hoo", "--hello"]
+        switch parser.parse(params) {
+        case .Success(let opts):
+            XCTFail("Parser \(parser) should have generated an error with parameters \(params)")
+        case .Failure(let err):
+            XCTAssert(true, "WTF?")
+        }
+        
     }
     
 }
