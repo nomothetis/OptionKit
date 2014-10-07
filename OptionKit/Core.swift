@@ -31,15 +31,30 @@ public enum OptionTrigger : Equatable, DebugPrintable {
     }
 }
 
-public struct OptionDefinition : Equatable, DebugPrintable {
+/// Describes an option for the parser.
+///
+/// An OptionDefinition consists of a trigger and a required number of parameters, which
+/// defaults to zero. It can additionally include a description.
+public struct OptionDefinition : Equatable, DebugPrintable, Hashable {
     let trigger:OptionTrigger
     let numberOfParameters:Int 
     
+    /// The designated initializer
+    ///
+    /// Creates an option definition from a trigger and a required number of parameters.
+    ///
+    /// :param: trigger the trigger that the parser will use to decide the option is being called.
+    /// :param: numberOfParameters the number of required parameters. Defaults to 0.
+    /// :returns: An OptionDefinition suitable for use by an OptionParser
     public init(trigger trig:OptionTrigger, numberOfParameters num:Int = 0) {
         self.trigger = trig
         self.numberOfParameters = num
     }
     
+    /// Determines if the given string matches this trigger.
+    ///
+    /// :param: str the string.
+    /// :returns: `true` if the string matches this option's trigger, `false` otherwise.
     func matches(str:String) -> Bool {
         switch self.trigger {
         case .Short(let char):
@@ -73,6 +88,12 @@ public struct OptionDefinition : Equatable, DebugPrintable {
     public var debugDescription:String {
         get {
             return "{ OptionDescription: \(self.trigger), \(self.numberOfParameters) }"
+        }
+    }
+    
+    public var hashValue:Int {
+        get {
+            return 0
         }
     }
 }
@@ -119,8 +140,9 @@ public struct OptionParser {
     ///
     /// :param: parameters the parameters passed to the command line utility.
     ///
-    /// :returns: A result containing either the parsed option or any error encountered.
-    public func parse(parameters:[String]) -> Result<[Option]> {
+    /// :returns: A result containing either a dictionary of option definitions to options, or the
+    ///           error encountered.
+    public func parse(parameters:[String]) -> Result<[OptionDefinition:Option]> {
         let normalizedParams = OptionParser.normalizeParameters(parameters)
         return normalizedParams.reduce(Result.Success(Box(val:[Option]()))) { result, next in
             
@@ -166,6 +188,12 @@ public struct OptionParser {
             }
             
             return .Success(Box(val:parsedOptions))
+        }.map { (optionsArray:[Option]) -> [OptionDefinition:Option] in
+            var dict = [OptionDefinition:Option]()
+            for opt in optionsArray {
+                dict[opt.definition] = opt
+            }
+            return dict
         }
     }
     
