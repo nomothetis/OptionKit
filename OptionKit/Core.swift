@@ -37,7 +37,8 @@ public enum OptionTrigger : Equatable, DebugPrintable {
 /// defaults to zero. It can additionally include a description.
 public struct OptionDefinition : Equatable, DebugPrintable, Hashable {
     let trigger:OptionTrigger
-    let numberOfParameters:Int 
+    let numberOfParameters:Int
+    let description:String
     
     /// The designated initializer
     ///
@@ -46,9 +47,10 @@ public struct OptionDefinition : Equatable, DebugPrintable, Hashable {
     /// :param: trigger the trigger that the parser will use to decide the option is being called.
     /// :param: numberOfParameters the number of required parameters. Defaults to 0.
     /// :returns: An OptionDefinition suitable for use by an OptionParser
-    public init(trigger trig:OptionTrigger, numberOfParameters num:Int = 0) {
+    public init(trigger trig:OptionTrigger, numberOfParameters num:Int = 0, description desc:String = "") {
         self.trigger = trig
         self.numberOfParameters = num
+        self.description = desc
     }
     
     /// Determines if the given string matches this trigger.
@@ -121,14 +123,12 @@ public struct Option : Equatable, DebugPrintable {
 }
 
 public struct OptionParser {
-    let flags:[OptionDefinition]
+    let definitions:[OptionDefinition]
     
-    public init(flags:[OptionDefinition] = []) {
-        self.flags = flags
-    }
-    
-    func parserWithAdditionalFlag(opt:OptionDefinition) -> OptionParser {
-        return OptionParser(flags: self.flags + [opt])
+    /// Initializes the parser.
+    ///
+    public init(definitions defs:[OptionDefinition] = []) {
+        self.definitions = defs
     }
     
     /// Parses an array of strings for options.
@@ -200,7 +200,7 @@ public struct OptionParser {
     func parseNewFlagIntoResult(current:Result<[Option]>, flagCandidate:String) -> Result<[Option]> {
             /* Does the next element want to be a flag? */
             if OptionDefinition.isValidOptionString(flagCandidate) {
-                for flag in self.flags {
+                for flag in self.definitions {
                     if flag.matches(flagCandidate) {
                         let newOption = Option(definition: flag, parameters: [])
                         return current.map { val in

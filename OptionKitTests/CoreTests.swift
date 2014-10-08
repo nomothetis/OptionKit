@@ -25,7 +25,7 @@ class OptionKitTests: XCTestCase {
     
     func testParserWithNoParameterShortOption() {
         let optionDescription = OptionDefinition(trigger:.Short("h"))
-        let parser = OptionParser(flags:[optionDescription])
+        let parser = OptionParser(definitions:[optionDescription])
         let expectedOption = Option(definition:optionDescription)
         
         var params = ["h"]
@@ -101,7 +101,7 @@ class OptionKitTests: XCTestCase {
     
     func testInvalidCallsOfNoParamterShortOption() {
         let optionDescription = OptionDefinition(trigger:.Short("h"))
-        let parser = OptionParser(flags:[optionDescription])
+        let parser = OptionParser(definitions:[optionDescription])
         let expectedOption = Option(definition:optionDescription)
         
         var params = ["--hello"]
@@ -116,7 +116,7 @@ class OptionKitTests: XCTestCase {
     
     func testParserWithNoParameterLongOption() {
         let optionDescription = OptionDefinition(trigger:.Long("hello"))
-        let parser = OptionParser(flags:[optionDescription])
+        let parser = OptionParser(definitions:[optionDescription])
         let expectedOption = Option(definition:optionDescription)
         
         var params = ["hello"]
@@ -191,7 +191,7 @@ class OptionKitTests: XCTestCase {
     
     func testInvalidCallsOfNoParamterLongOption() {
         let optionDescription = OptionDefinition(trigger:.Long("hello"), numberOfParameters:0)
-        let parser = OptionParser(flags:[optionDescription])
+        let parser = OptionParser(definitions:[optionDescription])
         let expectedOption = Option(definition:optionDescription)
         
         var params = ["-h"]
@@ -205,7 +205,7 @@ class OptionKitTests: XCTestCase {
     
     func testParserWithNoParameterMixedOption() {
         let optionDescription = OptionDefinition(trigger:.Mixed("h", "hello"))
-        let parser = OptionParser(flags:[optionDescription])
+        let parser = OptionParser(definitions:[optionDescription])
         let expectedOption = Option(definition:optionDescription)
         
         var params = ["h"]
@@ -336,7 +336,7 @@ class OptionKitTests: XCTestCase {
     func testOptionWithParameters() {
         // One parameter.
         var optionDescription = OptionDefinition(trigger:.Mixed("h", "hello"), numberOfParameters:1)
-        var parser = OptionParser(flags:[optionDescription])
+        var parser = OptionParser(definitions:[optionDescription])
         var expectedOption = Option(definition:optionDescription, parameters:["world"])
         
         var params = ["-h", "world"]
@@ -383,7 +383,7 @@ class OptionKitTests: XCTestCase {
         
         
         optionDescription = OptionDefinition(trigger:.Mixed("h", "hello"), numberOfParameters:3)
-        parser = OptionParser(flags:[optionDescription])
+        parser = OptionParser(definitions:[optionDescription])
         expectedOption = Option(definition:optionDescription, parameters:["world", "of", "coke"])
         
         params = ["-h", "world", "of", "coke"]
@@ -434,7 +434,7 @@ class OptionKitTests: XCTestCase {
         var optionDescription = OptionDefinition(trigger:.Mixed("h", "hello"), numberOfParameters:1)
         var optionDescription2 = OptionDefinition(trigger:.Mixed("p", "pom"))
         var optionDescription3 = OptionDefinition(trigger:.Mixed("n", "nom"), numberOfParameters:2)
-        var parser = OptionParser(flags:[optionDescription, optionDescription2, optionDescription3])
+        var parser = OptionParser(definitions:[optionDescription, optionDescription2, optionDescription3])
         var expectedOption1 = Option(definition:optionDescription, parameters:["world"])
         var expectedOption2 = Option(definition: optionDescription2)
         var expectedOption3 = Option(definition: optionDescription3, parameters:["boo", "hoo"])
