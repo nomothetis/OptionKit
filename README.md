@@ -54,3 +54,7 @@ The output would be:
 Invalid option: -r
 ```
 
+## Missing (Potential) Features
+
+* A good return type for the parsing. Currently, the parser returns a dictionary of options—but that isn't enough, since it does not return the remainder of the parameters, or the number of parameters consumed by the parser.
+* Support for closure-based configuration. Ruby's OptParse allows options to be defined with closures that are called when triggered. This is somewhat difficult with the strong typing requirements of Swift, but is worth considering.
