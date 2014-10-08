@@ -33,7 +33,7 @@ public enum OptionTrigger : Equatable, DebugPrintable {
 
 /// Describes an option for the parser.
 ///
-/// An OptionDefinition consists of a trigger and a required number of parameters, which
+/// An OptionDefinition consists of a trigger and a number of required parameters, which
 /// defaults to zero. It can additionally include a description.
 public struct OptionDefinition : Equatable, DebugPrintable, Hashable {
     let trigger:OptionTrigger
