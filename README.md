@@ -24,20 +24,22 @@ A simple, full example called `test.swift` might be:
 ```swift
 #!/usr/bin/env xcrun swift -F /Library/Frameworks
 
+import Foundation
 import OptionKit
 
-let opt1 = OptionDescription(.Mixed("e", "echo"))
-let parser = OptionParser(optionDescriptions:[opt1])
-
+let opt1 = OptionDefinition(trigger:.Mixed("e", "echo"))
+let parser = OptionParser(flags:[opt1])
+ 
 let result = parser.parse(Process.arguments)
 
 switch result {
-case .Success(let options):
-    if options[opt1] != nil {
-        println("\(Process.arguments[2..<arguments.count])")
-    }
+case .Success(let box):
+  let options = box.value
+  if options[opt1] != nil {
+    println("\(Process.arguments[2..<Process.arguments.count])")
+  }
 case .Failure(let err):
-    println(err)
+  println(err)
 }
 ```
 
@@ -47,10 +49,14 @@ The output would be:
 ~: ./test.swift -e hello
 [hello]
 ~: ./test.swift hello
-~: ./test.swift -e hello world
+~: ./test.swift --echo hello world
 [hello world]
 ~: ./test.swift -e
 ~: ./test.swift -r
 Invalid option: -r
 ```
 
+## Missing (Potential) Features
+
+* A good return type for the parsing. Currently, the parser returns a dictionary of options—but that isn't enough, since it does not return the remainder of the parameters, or the number of parameters consumed by the parser.
+* Support for closure-based configuration. Ruby's OptParse allows options to be defined with closures that are called when triggered. This is somewhat difficult with the strong typing requirements of Swift, but is worth considering.
