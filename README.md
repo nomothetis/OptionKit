@@ -47,7 +47,7 @@ The output would be:
 ~: ./test.swift -e hello
 [hello]
 ~: ./test.swift hello
-~: ./test.swift -e hello world
+~: ./test.swift --echo hello world
 [hello world]
 ~: ./test.swift -e
 ~: ./test.swift -r
