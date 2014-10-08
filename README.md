@@ -19,19 +19,38 @@ in that they cannot being with `-` or `--`, as they would be confused with trigg
 
 ## Examples
 
-A simple, full example might be:
+A simple, full example called `test.swift` might be:
 
 ```swift
 #!/usr/bin/env xcrun swift -F /Library/Frameworks
 
 import OptionKit
 
-let opt1 = OptionDescription("-r", "--reprint")
+let opt1 = OptionDescription(.Mixed("e", "echo"))
 let parser = OptionParser(optionDescriptions:[opt1])
 
 let result = parser.parse(Process.arguments)
 
-println(result)
+switch result {
+case .Success(let options):
+    if options[opt1] != nil {
+        println("\(Process.arguments[2..<arguments.count])")
+    }
+case .Failure(let err):
+    println(err)
+}
 ```
 
-The command line interaction will be like so:
+The output would be:
+
+```
+~: ./test.swift -e hello
+[hello]
+~: ./test.swift hello
+~: ./test.swift -e hello world
+[hello world]
+~: ./test.swift -e
+~: ./test.swift -r
+Invalid option: -r
+```
+
