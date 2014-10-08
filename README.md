@@ -17,6 +17,10 @@ OptionKit currently supports three types of options:
 An option (of any type) can have zero or more required parameters. Parameters are restricted
 in that they cannot being with `-` or `--`, as they would be confused with triggers.
 
+Unlike Ruby's OptionParse, OptionKit does not provide for callbacks to be triggered when an
+option is processed; instead, it returns a dictionary of options to parameters, wrapped in
+a Result object. Consumers can do with it as they please.
+
 ## Examples
 
 A simple, full example called `test.swift` might be:
@@ -56,7 +60,9 @@ The output would be:
 Invalid option: -r
 ```
 
-## Missing (Potential) Features
+## To Do
 
-* A good return type for the parsing. Currently, the parser returns a dictionary of options—but that isn't enough, since it does not return the remainder of the parameters, or the number of parameters consumed by the parser.
-* Support for closure-based configuration. Ruby's OptParse allows options to be defined with closures that are called when triggered. This is somewhat difficult with the strong typing requirements of Swift, but is worth considering.
+* Depend on LlamaKit's Result, rather than on a custom Result object.
+* Have a simple way to access the non-option parameters after parsing. Right now there is no way to do that, and it's the main reason the library isn't ready for general usage.
+* Add support for sub-parsers.
+* Add support for descriptions of options.
