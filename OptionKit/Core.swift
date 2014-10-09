@@ -52,10 +52,10 @@ public enum OptionTrigger : Equatable, DebugPrintable, Hashable {
 
 /// Describes an option for the parser.
 ///
-/// An OptionDefinition consists of a trigger and a number of required parameters, which
+/// An Option consists of a trigger and a number of required parameters, which
 /// defaults to zero. It also has includes a description, which is empty by default. The
 /// description does not affect equality.
-public struct OptionDefinition : Equatable, DebugPrintable, Hashable {
+public struct Option : Equatable, DebugPrintable, Hashable {
     let trigger:OptionTrigger
     let numberOfParameters:Int
     
@@ -114,7 +114,7 @@ public struct OptionDefinition : Equatable, DebugPrintable, Hashable {
     
     public var debugDescription:String {
         get {
-            return "{ OptionDescription: \(self.trigger), \(self.numberOfParameters) }"
+            return "{ Opt: \(self.trigger), \(self.numberOfParameters) }"
         }
     }
     
@@ -125,30 +125,30 @@ public struct OptionDefinition : Equatable, DebugPrintable, Hashable {
     }
 }
 
-public struct Option : Equatable, DebugPrintable {
-    let definition:OptionDefinition
+private struct OptionData : Equatable, DebugPrintable {
+    let option:Option
     let parameters:[String]
     
-    public init(definition def:OptionDefinition, parameters params:[String] = []) {
-        self.definition = def
+    private init(definition def:Option, parameters params:[String] = []) {
+        self.option = def
         self.parameters = params
     }
     
-    public var isValid:Bool {
+    private var isValid:Bool {
         get {
-            return parameters.count == definition.numberOfParameters
+            return parameters.count == option.numberOfParameters
         }
     }
     
-    public var debugDescription:String {
+    private var debugDescription:String {
         get {
-            return "{ Option:\n    \(self.definition)\n     \(self.parameters)}"
+            return "{ OptionData:\n    \(self.option)\n     \(self.parameters)}"
         }
     }
 }
 
 public struct OptionParser {
-    public let definitions:[OptionDefinition]
+    public let definitions:[Option]
     
     /// Initializes the parser.
     ///
@@ -157,8 +157,8 @@ public struct OptionParser {
     ///
     /// :param: definitions the option definitions to parse for.
     /// :returns: a parser
-    public init(definitions defs:[OptionDefinition] = []) {
-        let helpOption = OptionDefinition(trigger:.Mixed("h", "help"), helpDescription: "Display command help.")
+    public init(definitions defs:[Option] = []) {
+        let helpOption = Option(trigger:.Mixed("h", "help"), helpDescription: "Display command help.")
         if contains(defs, helpOption) {
             self.definitions = defs
         } else {
@@ -208,9 +208,9 @@ public struct OptionParser {
     ///
     /// :returns: A result containing either a dictionary of option definitions to options, or the
     ///           error encountered.
-    public func parse(parameters:[String]) -> Result<[OptionDefinition:Option]> {
+    public func parse(parameters:[String]) -> Result<[Option:[String]]> {
         let normalizedParams = OptionParser.normalizeParameters(parameters)
-        return normalizedParams.reduce(Result.Success(Box(val:[Option]()))) { result, next in
+        return normalizedParams.reduce(Result.Success(Box(val:[OptionData]()))) { result, next in
             
             return result.flatMap {optArray in
                 
@@ -218,16 +218,16 @@ public struct OptionParser {
                 if let lastOpt = optArray.last {
                     
                     /* Since we have parsed an option already, let's check if it needs more parameters. */
-                    if lastOpt.definition.numberOfParameters > lastOpt.parameters.count {
+                    if lastOpt.option.numberOfParameters > lastOpt.parameters.count {
                         
                         /* The option expects parameters; parameters cannot look like option triggers. */
-                        if (OptionDefinition.isValidOptionString(next)) {
+                        if (Option.isValidOptionString(next)) {
                             return .Failure("Option \(lastOpt) was not passed the required number of parameters before option \(next) was declared")
                         }
                         
                         /* Sanity prevails, the next element is not an option trigger. */
                         let shortOptArray = optArray[0 ..< optArray.count - 1]
-                        let newOption = Option(definition: lastOpt.definition, parameters: lastOpt.parameters + [next])
+                        let newOption = OptionData(definition: lastOpt.option, parameters: lastOpt.parameters + [next])
                         return .Success(Box(val: shortOptArray + [newOption]))
                     }
                     
@@ -254,21 +254,21 @@ public struct OptionParser {
             }
             
             return .Success(Box(val:parsedOptions))
-        }.map { (optionsArray:[Option]) -> [OptionDefinition:Option] in
-            var dict = [OptionDefinition:Option]()
+        }.map { (optionsArray:[OptionData]) -> [Option:[String]] in
+            var dict = [Option:[String]]()
             for opt in optionsArray {
-                dict[opt.definition] = opt
+                dict[opt.option] = opt.parameters
             }
             return dict
         }
     }
     
-    private func parseNewFlagIntoResult(current:Result<[Option]>, flagCandidate:String) -> Result<[Option]> {
+    private func parseNewFlagIntoResult(current:Result<[OptionData]>, flagCandidate:String) -> Result<[OptionData]> {
             /* Does the next element want to be a flag? */
-            if OptionDefinition.isValidOptionString(flagCandidate) {
+            if Option.isValidOptionString(flagCandidate) {
                 for flag in self.definitions {
                     if flag.matches(flagCandidate) {
-                        let newOption = Option(definition: flag, parameters: [])
+                        let newOption = OptionData(definition: flag, parameters: [])
                         return current.map { val in
                             return val + [newOption]
                         }
@@ -320,12 +320,12 @@ public func ==(lhs:OptionTrigger, rhs:OptionTrigger) -> Bool {
     }
 }
 
-public func ==(lhs:OptionDefinition, rhs:OptionDefinition) -> Bool {
+public func ==(lhs:Option, rhs:Option) -> Bool {
     return lhs.hashValue == rhs.hashValue
 }
 
-public func ==(lhs:Option, rhs:Option) -> Bool {
-    return (lhs.definition == rhs.definition) && (lhs.parameters == rhs.parameters)
+private func ==(lhs:OptionData, rhs:OptionData) -> Bool {
+    return (lhs.option == rhs.option) && (lhs.parameters == rhs.parameters)
 }
 
 
