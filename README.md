@@ -17,7 +17,7 @@ OptionKit currently supports three types of options:
 An option (of any type) can have zero or more required parameters. Parameters are restricted
 in that they cannot begin with `-` or `--`, as they would be confused with triggers.
 
-OptionKit's `OptionParser` class returns a dictionary of `OptionDescription` objects mapped to
+OptionKit's `OptionParser` class returns a dictionary of `Option` objects mapped to
 their parameters, if any. This is different from the way Ruby's OptionParse works, which is by
 providing callbacks to be triggered by option calls.
 
