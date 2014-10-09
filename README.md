@@ -54,20 +54,22 @@ let opt4 = Option(trigger:.Mixed("b", "break-everything"))
 let opt5 = Option(trigger:.Mixed("c", "counterstrike"))
 let parser = OptionParser(definitions:[opt1, opt3, opt4, opt5])
 
-let result = parser.parse(Process.arguments)
+let actualArguments = Array(Process.arguments[1..<Process.arguments.count])
+let result = parser.parse(actualArguments)
 
 switch result {
 case .Success(let box):
-  let options = box.value
-  if options[opt1] != nil {
-    println("\(Process.arguments[2..<Process.arguments.count])")
-  }
+    let (options, rest) = box.value
+    if options[opt1] != nil {
+        println("\(rest)")
+    }
 
-  if options[opt2] != nil {
-    println(parser.helpStringForCommandName("optionTest"))
-  }
+    if options[opt2] != nil {
+      println(parser.helpStringForCommandName("optionTest"))
+    }
+    
 case .Failure(let err):
-  println(err)
+   println(err)
 }
 ```
 
