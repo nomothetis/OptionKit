@@ -15,7 +15,7 @@ OptionKit currently supports three types of options:
 * Mixed options, triggered by either type, such as `-v` or `--version`
 
 An option (of any type) can have zero or more required parameters. Parameters are restricted
-in that they cannot being with `-` or `--`, as they would be confused with triggers.
+in that they cannot begin with `-` or `--`, as they would be confused with triggers.
 
 OptionKit's `OptionParser` class returns a dictionary of `OptionDescription` objects mapped to
 their parameters, if any. This is different from the way Ruby's OptionParse works, which is by
