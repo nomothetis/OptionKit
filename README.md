@@ -1,8 +1,9 @@
 OptionKit - Option Parsing in Swift
 =========
 
-OptionKit is an OS X framework to parse basic command-line options in pure Swift. It
-does not currently support sub-parsers.
+OptionKit is an OS X framework to parse basic command-line options in pure Swift. Currently,
+it has the most basic functionality necessary, but will probably expand to include more
+advanced features as the need arises.
 
 ## Installation
 
