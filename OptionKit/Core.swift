@@ -53,7 +53,8 @@ public enum OptionTrigger : Equatable, DebugPrintable, Hashable {
 /// Describes an option for the parser.
 ///
 /// An OptionDefinition consists of a trigger and a number of required parameters, which
-/// defaults to zero. It can additionally include a description.
+/// defaults to zero. It also has includes a description, which is empty by default. The
+/// description does not affect equality.
 public struct OptionDefinition : Equatable, DebugPrintable, Hashable {
     let trigger:OptionTrigger
     let numberOfParameters:Int
