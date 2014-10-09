@@ -4,24 +4,24 @@ OptionKit - Option Parsing in Swift
 =========
 
 OptionKit is an OS X framework to parse basic command-line options in pure Swift. It
-does not currently support sub-parsers, or any more advanced features.
+does not currently support sub-parsers.
 
 ## Overview
 
 OptionKit currently supports three types of options:
 
-* Short options, triggered by flags of the type `-f` or `fab` (which triggers three flags)
+* Short options, triggered by flags of the type `-f`
 * Long options, triggered by flags of the type `--long-option`
 * Mixed options, triggered by either type, such as `-v` or `--version`
 
 An option (of any type) can have zero or more required parameters. Parameters are restricted
 in that they cannot being with `-` or `--`, as they would be confused with triggers.
 
-Unlike Ruby's OptionParse, OptionKit does not provide for callbacks to be triggered when an
-option is processed; instead, it returns a dictionary of options to parameters, wrapped in
-a Result object. Consumers can do with it as they please.
+OptionKit's `OptionParser` class returns a dictionary of `OptionDescription` objects mapped to
+their parameters, if any. This is different from the way Ruby's OptionParse works, which is by
+providing callbacks to be triggered by option calls.
 
-## Examples
+## Example
 
 A simple, full example called `optionsTest.swift` might be:
 
@@ -73,6 +73,23 @@ usage: optionTest [-e|--echo] [-a|--allow-nothing] [-b|--break-everything]
 ~: ./optionTest.swift -d
 Invalid option: -d
 ```
+
+## Installation
+
+Minimum system requirements:
+
+* Xcode 6.1 GM Seed 2
+* OS X Mavericks 10.9.5
+
+Steps:
+
+* Clone this github repository, and build the project.
+* Run the tests, just for sanity. They should all pass.
+* Copy `OptionKit.framework` from the `DerivedData` directoy to `/Library/Frameworks`
+  (this will require `sudo` access)
+
+OptionKit should be available for use from a command line, as long as the shebang line
+includes `-F /Library/Frameworks`. (This should not be necessary, but currently seems to be.)
 
 ## To Do
 
