@@ -1,5 +1,3 @@
-**NOTE**: OPTIONKIT IS NOT YET READY FOR USE
-
 OptionKit - Option Parsing in Swift
 =========
 
