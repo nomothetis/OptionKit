@@ -149,8 +149,8 @@ private struct OptionData : Equatable, DebugPrintable {
 
 /// Represents the result of a successful parse.
 ///
-/// The dictionary is a mapping of encountered options to their parameters. The array is the
-/// list of remaining parameters.
+/// The dictionary is a mapping of encountered options to their parameters, where no-parameter
+/// options map to an empty array.. The array is the list of remaining parameters.
 public typealias ParseData = ([Option:[String]], [String])
 
 /// The option parser.
@@ -239,7 +239,7 @@ public struct OptionParser {
                         /* Sanity prevails, the next element is not an option trigger. */
                         let shortOptArray = optArray[0 ..< optArray.count - 1]
                         let newOption = OptionData(definition: lastOpt.option, parameters: lastOpt.parameters + [next])
-                        return .Success(Box(val: (shortOptArray + [newOption], args)))
+                        return success((shortOptArray + [newOption], args))
                     }
                     
                     /* No need for more parameters; parse the next option. */
@@ -265,7 +265,7 @@ public struct OptionParser {
                 }
             }
             
-            return .Success(Box(val:tuple))
+            return success(tuple)
         }.map { (tuple:([OptionData], [String])) -> ([Option:[String]], [String]) in
             let (optionsArray, args) = tuple
             var dict = [Option:[String]]()
