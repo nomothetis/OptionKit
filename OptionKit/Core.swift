@@ -147,6 +147,16 @@ private struct OptionData : Equatable, DebugPrintable {
     }
 }
 
+/// Represents the result of a successful parse.
+///
+/// The dictionary is a mapping of encountered options to their parameters. The array is the
+/// list of remaining parameters.
+public typealias ParseData = ([Option:[String]], [String])
+
+/// The option parser.
+///
+/// This is the workhorse of the library. It is initialized with a list of options and parses an
+/// array of strings assumed to be the call paramerers.
 public struct OptionParser {
     public let definitions:[Option]
     
@@ -206,14 +216,15 @@ public struct OptionParser {
     ///
     /// :param: parameters the parameters passed to the command line utility.
     ///
-    /// :returns: A result containing either a dictionary of option definitions to options, or the
-    ///           error encountered.
-    public func parse(parameters:[String]) -> Result<[Option:[String]]> {
+    /// :returns: A result containing either a ParseData tuple, or the error encountered.
+    public func parse(parameters:[String]) -> Result<ParseData> {
         let normalizedParams = OptionParser.normalizeParameters(parameters)
-        return normalizedParams.reduce(Result.Success(Box(val:[OptionData]()))) { result, next in
+        let firstCall = ([OptionData](), [String]())
+        return normalizedParams.reduce(success(firstCall)) { result, next in
             
-            return result.flatMap {optArray in
+            return result.flatMap {tuple in
                 
+                let (optArray, args) = tuple
                 /* First check if we are in the process of parsing an option with parameters. */
                 if let lastOpt = optArray.last {
                     
@@ -228,7 +239,7 @@ public struct OptionParser {
                         /* Sanity prevails, the next element is not an option trigger. */
                         let shortOptArray = optArray[0 ..< optArray.count - 1]
                         let newOption = OptionData(definition: lastOpt.option, parameters: lastOpt.parameters + [next])
-                        return .Success(Box(val: shortOptArray + [newOption]))
+                        return .Success(Box(val: (shortOptArray + [newOption], args)))
                     }
                     
                     /* No need for more parameters; parse the next option. */
@@ -238,8 +249,9 @@ public struct OptionParser {
                 /* This is the first option. Parse it! */
                 return self.parseNewFlagIntoResult(result, flagCandidate: next)
             }
-        }.flatMap { parsedOptions in
+        }.flatMap { tuple in
             
+            let (parsedOptions, args) = tuple
             // We need to carry out one last check. Because of the way the above reduce works, it's
             // possible the very last option is in fact not valid. There are ways around that, like
             // having an array of results and then coalescing it into a single Result array if all
@@ -247,38 +259,41 @@ public struct OptionParser {
             // end.
             if let lastOpt = parsedOptions.last {
                 if lastOpt.isValid {
-                    return .Success(Box(val:parsedOptions))
+                    return success((parsedOptions, args))
                 } else {
                     return .Failure("Option \(lastOpt) is invalid")
                 }
             }
             
-            return .Success(Box(val:parsedOptions))
-        }.map { (optionsArray:[OptionData]) -> [Option:[String]] in
+            return .Success(Box(val:tuple))
+        }.map { (tuple:([OptionData], [String])) -> ([Option:[String]], [String]) in
+            let (optionsArray, args) = tuple
             var dict = [Option:[String]]()
             for opt in optionsArray {
                 dict[opt.option] = opt.parameters
             }
-            return dict
+            return (dict, args)
         }
     }
     
-    private func parseNewFlagIntoResult(current:Result<[OptionData]>, flagCandidate:String) -> Result<[OptionData]> {
-            /* Does the next element want to be a flag? */
-            if Option.isValidOptionString(flagCandidate) {
-                for flag in self.definitions {
-                    if flag.matches(flagCandidate) {
-                        let newOption = OptionData(definition: flag, parameters: [])
-                        return current.map { val in
-                            return val + [newOption]
-                        }
+    private func parseNewFlagIntoResult(current:Result<([OptionData], [String])>, flagCandidate:String) -> Result<([OptionData], [String])> {
+        /* Does the next element want to be a flag? */
+        if Option.isValidOptionString(flagCandidate) {
+            for flag in self.definitions {
+                if flag.matches(flagCandidate) {
+                    let newOption = OptionData(definition: flag, parameters: [])
+                    return current.map { val in
+                        return (val.0 + [newOption], val.1)
                     }
                 }
-                
-                return .Failure("Invalid option: \(flagCandidate)")
             }
             
-            return current
+            return .Failure("Invalid option: \(flagCandidate)")
+        }
+        
+        return current.map { val in
+            return (val.0, val.1 + [flagCandidate])
+        }
     }
     
     static func normalizeParameters(parameters:[String]) -> [String] {

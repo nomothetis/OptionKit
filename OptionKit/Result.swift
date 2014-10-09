@@ -56,6 +56,10 @@ public enum Result<T> : Printable {
     }
 }
 
+func success<T>(content:T) -> Result<T> {
+    return Result.Success(Box(val: content))
+}
+
 /**
  Sad type that needs to exist because we can't have non-fixed layout enums yet…
  */
