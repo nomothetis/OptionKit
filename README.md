@@ -23,7 +23,7 @@ a Result object. Consumers can do with it as they please.
 
 ## Examples
 
-A simple, full example called `test.swift` might be:
+A simple, full example called `optionsTest.swift` might be:
 
 ```swift
 #!/usr/bin/env xcrun swift -F /Library/Frameworks
@@ -32,8 +32,12 @@ import Foundation
 import OptionKit
 
 let opt1 = OptionDefinition(trigger:.Mixed("e", "echo"))
-let parser = OptionParser(flags:[opt1])
- 
+let opt2 = OptionDefinition(trigger:.Mixed("h", "help"))
+let opt3 = OptionDefinition(trigger:.Mixed("a", "allow-nothing"))
+let opt4 = OptionDefinition(trigger:.Mixed("b", "break-everything"))
+let opt5 = OptionDefinition(trigger:.Mixed("c", "counterstrike"))
+let parser = OptionParser(definitions:[opt1, opt3, opt4, opt5])
+
 let result = parser.parse(Process.arguments)
 
 switch result {
@@ -41,6 +45,10 @@ case .Success(let box):
   let options = box.value
   if options[opt1] != nil {
     println("\(Process.arguments[2..<Process.arguments.count])")
+  }
+
+  if options[opt2] != nil {
+    println(parser.helpStringForCommandName("optionTest"))
   }
 case .Failure(let err):
   println(err)
@@ -50,14 +58,20 @@ case .Failure(let err):
 The output would be:
 
 ```
-~: ./test.swift -e hello
+~: ./optionTest.swift -e hello
 [hello]
-~: ./test.swift hello
-~: ./test.swift --echo hello world
-[hello world]
-~: ./test.swift -e
-~: ./test.swift -r
-Invalid option: -r
+~: ./optionTest.swift --echo hello world
+[hello, world]
+~: ./optionTest.swift -h
+usage: optionTest [-e|--echo] [-a|--allow-nothing] [-b|--break-everything]
+                  [-c|--counterstrike] [-h|--help]
+
+~: ./optionTest.swift --help
+usage: optionTest [-e|--echo] [-a|--allow-nothing] [-b|--break-everything]
+                  [-c|--counterstrike] [-h|--help]
+
+~: ./optionTest.swift -d
+Invalid option: -d
 ```
 
 ## To Do
