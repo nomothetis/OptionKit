@@ -4,7 +4,24 @@ OptionKit - Option Parsing in Swift
 OptionKit is an OS X framework to parse basic command-line options in pure Swift. It
 does not currently support sub-parsers.
 
-### Overview
+## Installation
+
+Minimum system requirements:
+
+* Xcode 6.1 GM Seed 2
+* OS X Mavericks 10.9.5
+
+Steps:
+
+* Clone this github repository, and build the project.
+* Run the tests, just for sanity. They should all pass.
+* Copy `OptionKit.framework` from the `DerivedData` directoy to `/Library/Frameworks`
+  (this will require `sudo` access)
+
+OptionKit should be available for use from a command line, as long as the shebang line
+includes `-F /Library/Frameworks`. (This should not be necessary, but currently seems to be.)
+
+## Usage
 
 OptionKit currently supports three types of options:
 
@@ -72,23 +89,6 @@ usage: optionTest [-e|--echo] [-a|--allow-nothing] [-b|--break-everything]
 ~: ./optionTest.swift -d
 Invalid option: -d
 ```
-
-### Installation
-
-Minimum system requirements:
-
-* Xcode 6.1 GM Seed 2
-* OS X Mavericks 10.9.5
-
-Steps:
-
-* Clone this github repository, and build the project.
-* Run the tests, just for sanity. They should all pass.
-* Copy `OptionKit.framework` from the `DerivedData` directoy to `/Library/Frameworks`
-  (this will require `sudo` access)
-
-OptionKit should be available for use from a command line, as long as the shebang line
-includes `-F /Library/Frameworks`. (This should not be necessary, but currently seems to be.)
 
 ### To Do
 
