@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		7D23935019D60978009B12AB /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D23934F19D60978009B12AB /* Result.swift */; };
-		7D50B47319D3A46600743806 /* OptionKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 7D50B47219D3A46600743806 /* OptionKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7D50B47919D3A46600743806 /* OptionKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D50B46D19D3A46600743806 /* OptionKit.framework */; };
 		7D50B48019D3A46600743806 /* CoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D50B47F19D3A46600743806 /* CoreTests.swift */; };
 		7D50B48A19D3A48500743806 /* Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D50B48919D3A48500743806 /* Core.swift */; };
@@ -115,7 +114,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7D50B47319D3A46600743806 /* OptionKit.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

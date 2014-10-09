@@ -15,11 +15,11 @@ class OptionKitTests: XCTestCase {
     func testParserWithNoOption() {
         let parser = OptionParser()
         parser.parse(["--hello"]).map {opts in
-            XCTFail("Empty parser should process no options; instead processed: \(opts)")
+            XCTFail("Empty parser should process no options other than -h|--help; instead processed: \(opts)")
         }
         
-        parser.parse(["-h"]).map {opts in
-            XCTFail("Empty parser should process no options; instead processed: \(opts)")
+        parser.parse(["-v"]).map {opts in
+            XCTFail("Empty parser should process no options other than -h|--help; instead processed: \(opts)")
         }
     }
     
@@ -190,11 +190,11 @@ class OptionKitTests: XCTestCase {
     }
     
     func testInvalidCallsOfNoParamterLongOption() {
-        let optionDescription = OptionDefinition(trigger:.Long("hello"), numberOfParameters:0)
+        let optionDescription = OptionDefinition(trigger:.Long("vroom"), numberOfParameters:0)
         let parser = OptionParser(definitions:[optionDescription])
         let expectedOption = Option(definition:optionDescription)
         
-        var params = ["-h"]
+        var params = ["-v"]
         switch parser.parse(params) {
         case .Success(let opts):
             XCTFail("Parsing should not have succeeded for parser: \(parser), options: \(params)")

@@ -12,7 +12,7 @@ import Foundation
  Eventually intends to be a getopt-compatible option parser.
  */
 
-public enum OptionTrigger : Equatable, DebugPrintable {
+public enum OptionTrigger : Equatable, DebugPrintable, Hashable {
     case Short(Character)
     case Long(String)
     case Mixed(Character, String)
@@ -25,8 +25,27 @@ public enum OptionTrigger : Equatable, DebugPrintable {
             case .Long(let str):
                 return "--\(str)"
             case .Mixed(let c, let str):
-                return "(-\(c), --\(str))"
+                return "[-\(c)|--\(str)]"
             }
+        }
+    }
+    
+    public var usageDescription:String {
+        get {
+            switch self {
+            case .Short(let c):
+                return "[-\(c)]"
+            case .Long(let str):
+                return "[--\(str)]"
+            case .Mixed(let c, let str):
+                return "[-\(c)|--\(str)]"
+            }
+        }
+    }
+    
+    public var hashValue:Int {
+        get {
+            return self.usageDescription.hashValue
         }
     }
 }
@@ -38,19 +57,24 @@ public enum OptionTrigger : Equatable, DebugPrintable {
 public struct OptionDefinition : Equatable, DebugPrintable, Hashable {
     let trigger:OptionTrigger
     let numberOfParameters:Int
-    let description:String
+    
+    /// The description of how the option works. This description has no bearing on equality.
+    let helpDescription:String
     
     /// The designated initializer
     ///
     /// Creates an option definition from a trigger and a required number of parameters.
     ///
-    /// :param: trigger the trigger that the parser will use to decide the option is being called.
+    /// :param: trigger            the trigger that the parser will use to decide the option is
+    ///                            being called.
     /// :param: numberOfParameters the number of required parameters. Defaults to 0.
-    /// :returns: An OptionDefinition suitable for use by an OptionParser
-    public init(trigger trig:OptionTrigger, numberOfParameters num:Int = 0, description desc:String = "") {
+    /// :param: helpDescription    the string that will be displayed when the -h flag is triggered.
+    ///
+    /// :returns:                  An OptionDefinition suitable for use by an OptionParser
+    public init(trigger trig:OptionTrigger, numberOfParameters num:Int = 0, helpDescription desc:String = "") {
         self.trigger = trig
         self.numberOfParameters = num
-        self.description = desc
+        self.helpDescription = desc
     }
     
     /// Determines if the given string matches this trigger.
@@ -95,7 +119,7 @@ public struct OptionDefinition : Equatable, DebugPrintable, Hashable {
     
     public var hashValue:Int {
         get {
-            return 0
+            return self.debugDescription.hashValue
         }
     }
 }
@@ -123,12 +147,53 @@ public struct Option : Equatable, DebugPrintable {
 }
 
 public struct OptionParser {
-    let definitions:[OptionDefinition]
+    public let definitions:[OptionDefinition]
     
     /// Initializes the parser.
     ///
+    /// By default, each parser has an option triggered by `-h` and `--help`. It also provides
+    /// a console-displayable string of the options via the `helpStringForCommandName` method.
+    ///
+    /// :param: definitions the option definitions to parse for.
+    /// :returns: a parser
     public init(definitions defs:[OptionDefinition] = []) {
-        self.definitions = defs
+        let helpOption = OptionDefinition(trigger:.Mixed("h", "help"), helpDescription: "Display command help.")
+        if contains(defs, helpOption) {
+            self.definitions = defs
+        } else {
+            self.definitions = defs + [helpOption]
+        }
+    }
+    
+    /// Returns a default help string based on the passed command name and the existing options.
+    ///
+    /// The string is suitable to be displayed on the command line and consists of multiple lines,
+    /// all under 80 characters.
+    ///
+    /// :param: commandName the name of the command.
+    /// :returns: an English-language string suitable for command-line display.
+    public func helpStringForCommandName(commandName:String) -> String {
+        let maximumLineWidth = 80
+        
+        // The leading string, to properly indent.
+        var leadingString = "       "
+        for i in 0..<countElements(commandName) {
+            leadingString += " "
+        }
+        leadingString += " "
+        
+        // Now compute the string!
+        return self.definitions.reduce(["usage: \(commandName)"]) { lines, optDef in
+            let nextDescription = optDef.trigger.usageDescription
+            let additionalCharacters = countElements(nextDescription) + 1 // +1 for the space
+            if countElements(lines.last!) < 80 - additionalCharacters {
+                return lines[0..<lines.count - 1] + [lines.last! + " " + nextDescription]
+            }
+            
+            return lines + [leadingString + nextDescription]
+        }.reduce("") { message, line in
+            return message + line + "\n"
+        }
     }
     
     /// Parses an array of strings for options.
@@ -197,7 +262,7 @@ public struct OptionParser {
         }
     }
     
-    func parseNewFlagIntoResult(current:Result<[Option]>, flagCandidate:String) -> Result<[Option]> {
+    private func parseNewFlagIntoResult(current:Result<[Option]>, flagCandidate:String) -> Result<[Option]> {
             /* Does the next element want to be a flag? */
             if OptionDefinition.isValidOptionString(flagCandidate) {
                 for flag in self.definitions {
@@ -255,7 +320,7 @@ public func ==(lhs:OptionTrigger, rhs:OptionTrigger) -> Bool {
 }
 
 public func ==(lhs:OptionDefinition, rhs:OptionDefinition) -> Bool {
-    return (lhs.trigger == rhs.trigger) && (lhs.numberOfParameters == rhs.numberOfParameters)
+    return lhs.hashValue == rhs.hashValue
 }
 
 public func ==(lhs:Option, rhs:Option) -> Bool {
