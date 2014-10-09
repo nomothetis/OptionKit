@@ -31,11 +31,11 @@ A simple, full example called `optionsTest.swift` might be:
 import Foundation
 import OptionKit
 
-let opt1 = OptionDefinition(trigger:.Mixed("e", "echo"))
-let opt2 = OptionDefinition(trigger:.Mixed("h", "help"))
-let opt3 = OptionDefinition(trigger:.Mixed("a", "allow-nothing"))
-let opt4 = OptionDefinition(trigger:.Mixed("b", "break-everything"))
-let opt5 = OptionDefinition(trigger:.Mixed("c", "counterstrike"))
+let opt1 = Option(trigger:.Mixed("e", "echo"))
+let opt2 = Option(trigger:.Mixed("h", "help"))
+let opt3 = Option(trigger:.Mixed("a", "allow-nothing"))
+let opt4 = Option(trigger:.Mixed("b", "break-everything"))
+let opt5 = Option(trigger:.Mixed("c", "counterstrike"))
 let parser = OptionParser(definitions:[opt1, opt3, opt4, opt5])
 
 let result = parser.parse(Process.arguments)
