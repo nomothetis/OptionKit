@@ -13,13 +13,19 @@ Minimum system requirements:
 
 Steps:
 
-* Clone this github repository, and build the project.
-* Run the tests, just for sanity. They should all pass.
-* Copy `OptionKit.framework` from the `DerivedData` directoy to `/Library/Frameworks`
+1. Clone this github repository, and build the project.
+1. Run the tests, just for sanity. They should all pass.
+1. Copy `OptionKit.framework` from the `DerivedData` directoy to `/Library/Frameworks`
   (this will require `sudo` access)
 
-OptionKit should be available for use from a command line, as long as the shebang line
-includes `-F /Library/Frameworks`. (This should not be necessary, but currently seems to be.)
+OptionKit should now be available for use from a command line script. The shebang needs
+to read:
+
+```swift
+#!/usr/bin/env xcrun swift -F /Library/Frameworks
+```
+This is because the Swift compiler, unlike Clang, doesn't automatically pick up frameworks in
+`/Library/Frameworks`.
 
 ## Usage
 
