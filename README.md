@@ -93,7 +93,9 @@ includes `-F /Library/Frameworks`. (This should not be necessary, but currently 
 
 ### To Do
 
-* Depend on LlamaKit's Result, rather than on a custom Result object.
+* Depend on [LlamaKit][]'s Result, rather than on a custom Result object.
 * Have a simple way to access the non-option parameters after parsing. Right now there is no way to do that, and it's the main reason the library isn't ready for general usage.
 * Add support for sub-parsers.
 * Add support for descriptions of options.
+
+[LlamaKit]:https://github.com/LlamaKit/LlamaKit
