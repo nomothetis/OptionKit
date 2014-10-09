@@ -14,12 +14,13 @@ OptionKit currently supports three types of options:
 * Long options, triggered by flags of the type `--long-option`
 * Mixed options, triggered by either type, such as `-v` or `--version`
 
-An option (of any type) can have zero or more required parameters. Parameters are restricted
+An option can have zero or more required parameters. Parameters are restricted
 in that they cannot begin with `-` or `--`, as they would be confused with triggers.
 
-OptionKit's `OptionParser` class returns a dictionary of `Option` objects mapped to
-their parameters, if any. This is different from the way Ruby's OptionParse works, which is by
-providing callbacks to be triggered by option calls.
+OptionKit's `OptionParser` class returns a `ParseData` type, which consists of:
+
+* A dictionary of `Option` objects mapped to their (possibly empty) parameter list.
+* A list of remaining arguments.
 
 ### Example
 
@@ -93,9 +94,8 @@ includes `-F /Library/Frameworks`. (This should not be necessary, but currently 
 
 ### To Do
 
-* Depend on [LlamaKit][]'s Result, rather than on a custom Result object.
-* Have a simple way to access the non-option parameters after parsing. Right now there is no way to do that, and it's the main reason the library isn't ready for general usage.
+* Depend on [LlamaKit][]'s `Result`, rather than on a custom type.
 * Add support for sub-parsers.
-* Add support for descriptions of options.
+* Make help string include per-option help.
 
 [LlamaKit]:https://github.com/LlamaKit/LlamaKit
