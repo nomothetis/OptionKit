@@ -16,7 +16,7 @@ Steps:
 
 1. Clone this github repository, and build the project.
 1. Run the tests, just for sanity. They should all pass.
-1. Copy `OptionKit.framework` from the `DerivedData` directoy to `/Library/Frameworks`
+1. Copy `OptionKit.framework` from the `DerivedData` directory to `/Library/Frameworks`
   (this will require `sudo` access)
 
 OptionKit should now be available for use from a command line script. The shebang needs
