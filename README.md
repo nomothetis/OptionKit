@@ -32,8 +32,8 @@ This is because the Swift compiler, unlike Clang, doesn't automatically pick up 
 
 OptionKit currently supports three types of options:
 
-* Short options, triggered by flags of the type `-f`
-* Long options, triggered by flags of the type `--long-option`
+* Short options, triggered by flags of type `-f`
+* Long options, triggered by flags of type `--long-option`
 * Mixed options, triggered by either type, such as `-v` or `--version`
 
 An option can have zero or more required parameters. Parameters are restricted
