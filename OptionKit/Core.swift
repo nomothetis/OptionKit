@@ -94,12 +94,12 @@ public struct Option : Equatable, DebugPrintable, Hashable {
     }
     
     static func isValidOptionString(str:String) -> Bool{
-        let count = countElements(str)
-        if count < 2 {
+        let length = count(str)
+        if length < 2 {
             return false
         }
         
-        if count == 2 {
+        if length == 2 {
             if str[str.startIndex] != "-" {
                 return false
             }
@@ -188,7 +188,7 @@ public struct OptionParser {
         
         // The leading string, to properly indent.
         var leadingString = "       "
-        for i in 0..<countElements(commandName) {
+        for i in 0..<count(commandName) {
             leadingString += " "
         }
         leadingString += " "
@@ -196,8 +196,8 @@ public struct OptionParser {
         // Now compute the string!
         return self.definitions.reduce(["usage: \(commandName)"]) { lines, optDef in
             let nextDescription = optDef.trigger.usageDescription
-            let additionalCharacters = countElements(nextDescription) + 1 // +1 for the space
-            if countElements(lines.last!) < 80 - additionalCharacters {
+            let additionalCharacters = count(nextDescription) + 1 // +1 for the space
+            if count(lines.last!) < 80 - additionalCharacters {
                 return lines[0..<lines.count - 1] + [lines.last! + " " + nextDescription]
             }
             
