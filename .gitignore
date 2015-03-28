@@ -1,34 +1,4 @@
-# Exclude the build directories
-[Dd]erived[Dd]ata/*
-**/[Dd]erived[Dd]ata/*
-[Bb]uild/*
-**/[Bb]uild/*
-Intermediates
-
-# Exclude temp and swap files
-*~.nib
-*.swp
-*~
-
-# Exclude OS X cruft
+Pods
+*.xcuserdatad
 .DS_Store
-[Tt]humbs.db
-.Trashes
-
-# Exclude User Data from Workspace and Projects
-xcuserdata
-*.xcuserdata
-*.xccheckout
-
-# Exclude CocoaPods pods from
-[Pp]ods/*
-Podfile.lock
-WXMaps.podspec
-
-# Exclude other common files
-*.log
-*.bak*
-
-
-
-
+Carthage/**
