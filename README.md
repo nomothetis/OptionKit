@@ -5,29 +5,6 @@ OptionKit is an OS X framework to parse basic command-line options in pure Swift
 it has the most basic functionality necessary, but will probably expand to include more
 advanced features as the need arises.
 
-## Installation
-
-Minimum system requirements:
-
-* Xcode 6.1 GM Seed 2
-* OS X Mavericks 10.9.5
-
-Steps:
-
-1. Clone this github repository, and build the project.
-1. Run the tests, just for sanity. They should all pass.
-1. Copy `OptionKit.framework` from the `DerivedData` directory to `/Library/Frameworks`
-  (this will require `sudo` access)
-
-OptionKit should now be available for use from a command line script. The shebang needs
-to read:
-
-```swift
-#!/usr/bin/env xcrun swift -F /Library/Frameworks
-```
-This is because the Swift compiler, unlike Clang, doesn't automatically pick up frameworks in
-`/Library/Frameworks`.
-
 ## Usage
 
 OptionKit currently supports three types of options:
@@ -99,10 +76,39 @@ usage: optionTest [-e|--echo] [-a|--allow-nothing] [-b|--break-everything]
 Invalid option: -d
 ```
 
+## Installation
+
+Minimum system requirements:
+
+* Xcode 6.3β4
+* OS X Yosemite 10.10
+
+Steps:
+
+1. Clone this github repository, and build the project.
+1. Run the tests, just for sanity. They should all pass.
+1. Copy `OptionKit.framework` from the `DerivedData` directory to `/Library/Frameworks`
+  (this will require `sudo` access)
+
+OptionKit should now be available for use from a command line script. The shebang needs
+to read:
+
+```swift
+#!/usr/bin/env xcrun swift -F /Library/Frameworks
+```
+This is because the Swift compiler, unlike Clang, doesn't automatically pick up frameworks in
+`/Library/Frameworks`.
+
+## Including OptionKit in Other Libraries
+
+Use [Carthage](https://github.com/Carthage/Carthage). OptionKit uses semantic versioning, so
+the corresponding Cartfile line should be:
+
+```
+github "nomothetis/OptionKit" ~> 0.2.0
+```
+
 ### To Do
 
-* Depend on [LlamaKit][]'s `Result`, rather than on a custom type.
 * Add support for sub-parsers.
 * Make help string include per-option help.
-
-[LlamaKit]:https://github.com/LlamaKit/LlamaKit
