@@ -30,7 +30,7 @@ class OptionKitTests: XCTestCase {
         var params = ["h"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, ["h"], "Incorrect non-option parameters")
             XCTAssertEqual(0, options.count, "Nothing should have been parsed.")
         case .Failure(let opts):
@@ -40,7 +40,7 @@ class OptionKitTests: XCTestCase {
         params = ["-h"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(1, options.count, "Incorrect number of options parsed.")
             XCTAssertNotNil(options[optionDescription], "Incorrect option parsed.")
         case .Failure(let err):
@@ -75,7 +75,7 @@ class OptionKitTests: XCTestCase {
         params = ["-h", "lastIsBest"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, ["lastIsBest"], "Incorrect non-option parameters")
             XCTAssertEqual(1, options.count, "Incorrect number of options parsed.")
             XCTAssertNotNil(options[optionDescription], "Parser \(parser) should have parsed \(params)")
@@ -86,7 +86,7 @@ class OptionKitTests: XCTestCase {
         params = ["firstRules", "-h"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, ["firstRules"], "Incorrect non-option parameters")
             XCTAssertEqual(1, options.count, "Incorrect number of options parsed.")
             XCTAssertNotNil(options[optionDescription], "Parser \(parser) should have parsed \(params)")
@@ -97,7 +97,7 @@ class OptionKitTests: XCTestCase {
         params = ["sandwiches", "-h", "rock"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, ["sandwiches", "rock"], "Incorrect non-option parameters")
             XCTAssertEqual(1, options.count, "Incorrect number of options parsed.")
             XCTAssertNotNil(options[optionDescription], "Parser \(parser) should have parsed \(params)")
@@ -128,7 +128,7 @@ class OptionKitTests: XCTestCase {
         var params = ["hello"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, ["hello"], "Incorrect non-option parameters")
             XCTAssertEqual(0, options.count, "Nothing should have been parsed.")
         case .Failure(let opts):
@@ -138,7 +138,7 @@ class OptionKitTests: XCTestCase {
         params = ["--hello"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, [], "Incorrect non-option parameters")
             XCTAssertEqual(1, options.count, "Incorrect number of options parsed.")
             XCTAssertNotNil(options[optionDescription], "Parser \(parser) should have parsed \(params)")
@@ -174,7 +174,7 @@ class OptionKitTests: XCTestCase {
         params = ["--hello", "lastIsBest"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, ["lastIsBest"], "Incorrect non-option parameters")
             XCTAssertEqual(1, options.count, "Incorrect number of options parsed.")
             XCTAssertNotNil(options[optionDescription], "Parser \(parser) should have parsed \(params)")
@@ -185,7 +185,7 @@ class OptionKitTests: XCTestCase {
         params = ["firstRules", "--hello"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, ["firstRules"], "Incorrect non-option parameters")
             XCTAssertEqual(1, options.count, "Incorrect number of options parsed.")
             XCTAssertNotNil(options[optionDescription], "Parser \(parser) should have parsed \(params)")
@@ -196,7 +196,7 @@ class OptionKitTests: XCTestCase {
         params = ["sandwiches", "--hello", "rock"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, ["sandwiches", "rock"], "Incorrect non-option parameters")
             XCTAssertEqual(1, options.count, "Incorrect number of options parsed.")
             XCTAssertNotNil(options[optionDescription], "Parser \(parser) should have parsed \(params)")
@@ -225,7 +225,7 @@ class OptionKitTests: XCTestCase {
         var params = ["h"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, ["h"], "Incorrect non-option parameters")
             XCTAssertEqual(0, options.count, "No options should have been parsed.")
         case .Failure(let opts):
@@ -235,7 +235,7 @@ class OptionKitTests: XCTestCase {
         params = ["-h"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, [], "Incorrect non-option parameters")
             XCTAssertEqual(1, options.count, "Incorrect number of options parsed.")
             XCTAssertNotNil(options[optionDescription], "Parser \(parser) should have parsed \(params)")
@@ -271,7 +271,7 @@ class OptionKitTests: XCTestCase {
         params = ["-h", "lastIsBest"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, ["lastIsBest"], "Incorrect non-option parameters")
             XCTAssertEqual(1, options.count, "Incorrect number of options parsed.")
             XCTAssertNotNil(options[optionDescription], "Parser \(parser) should have parsed \(params)")
@@ -282,7 +282,7 @@ class OptionKitTests: XCTestCase {
         params = ["firstRules", "-h"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, ["firstRules"], "Incorrect non-option parameters")
             XCTAssertEqual(1, options.count, "Incorrect number of options parsed.")
             XCTAssertNotNil(options[optionDescription], "Parser \(parser) should have parsed \(params)")
@@ -293,7 +293,7 @@ class OptionKitTests: XCTestCase {
         params = ["sandwiches", "-h", "rock"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, ["sandwiches", "rock"], "Incorrect non-option parameters")
             XCTAssertEqual(1, options.count, "Incorrect number of options parsed.")
             XCTAssertNotNil(options[optionDescription], "Parser \(parser) should have parsed \(params)")
@@ -306,7 +306,7 @@ class OptionKitTests: XCTestCase {
         params = ["--hello"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, [], "Incorrect non-option parameters")
             XCTAssertEqual(1, options.count, "Incorrect number of options parsed.")
             XCTAssertNotNil(options[optionDescription], "Parser \(parser) should have parsed \(params)")
@@ -334,7 +334,7 @@ class OptionKitTests: XCTestCase {
         params = ["--hello", "lastIsBest"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, ["lastIsBest"], "Incorrect non-option parameters")
             XCTAssertEqual(1, options.count, "Incorrect number of options parsed.")
             XCTAssertNotNil(options[optionDescription], "Parser \(parser) should have parsed \(params)")
@@ -345,7 +345,7 @@ class OptionKitTests: XCTestCase {
         params = ["firstRules", "--hello"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, ["firstRules"], "Incorrect non-option parameters")
             XCTAssertEqual(1, options.count, "Incorrect number of options parsed.")
             XCTAssertNotNil(options[optionDescription], "Parser \(parser) should have parsed \(params)")
@@ -356,7 +356,7 @@ class OptionKitTests: XCTestCase {
         params = ["sandwiches", "--hello", "rock"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, ["sandwiches", "rock"], "Incorrect non-option parameters")
             XCTAssertEqual(1, options.count, "Incorrect number of options parsed.")
             XCTAssertNotNil(options[optionDescription], "Parser \(parser) should have parsed \(params)")
@@ -373,7 +373,7 @@ class OptionKitTests: XCTestCase {
         var params = ["-h", "world"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, [], "Incorrect non-option parameters")
             XCTAssertEqual(1, options.count, "Incorrect number of options parsed.")
             XCTAssertNotNil(options[optionDescription], "Parser \(parser) should have parsed \(params)")
@@ -384,7 +384,7 @@ class OptionKitTests: XCTestCase {
         params = ["--hello", "world"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, [], "Incorrect non-option parameters")
             XCTAssertEqual(1, options.count, "Incorrect number of options parsed.")
             XCTAssertNotNil(options[optionDescription], "Parser \(parser) should have parsed \(params)")
@@ -423,7 +423,7 @@ class OptionKitTests: XCTestCase {
         params = ["-h", "world", "of", "coke"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, [], "Incorrect non-option parameters")
             XCTAssertEqual(1, options.count, "Incorrect number of options parsed.")
             XCTAssertNotNil(options[optionDescription], "Parser \(parser) should have parsed \(params)")
@@ -434,7 +434,7 @@ class OptionKitTests: XCTestCase {
         params = ["--hello", "world", "of", "coke"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, [], "Incorrect non-option parameters")
             XCTAssertEqual(1, options.count, "Incorrect number of options parsed.")
             XCTAssertNotNil(options[optionDescription], "Parser \(parser) should have parsed \(params)")
@@ -480,7 +480,7 @@ class OptionKitTests: XCTestCase {
         var params = ["--hello", "world", "of"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, ["of"], "Incorrect non-option parameters")
             XCTAssertEqual(1, options.count, "Parser \(parser) should have parsed \(params)")
             if let optParams = options[optionDescription] {
@@ -495,7 +495,7 @@ class OptionKitTests: XCTestCase {
         params = ["--hello", "world"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, [], "Incorrect non-option parameters")
             XCTAssertEqual(1, options.count, "Parser \(parser) should have parsed \(params)")
             if let optParams = options[optionDescription] {
@@ -510,7 +510,7 @@ class OptionKitTests: XCTestCase {
         params = ["--hello", "world", "-p"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, [], "Incorrect non-option parameters")
             XCTAssertEqual(2, options.count, "Parser \(parser) should have parsed \(params)")
             if let optParams = options[optionDescription] {
@@ -531,7 +531,7 @@ class OptionKitTests: XCTestCase {
         params = ["--hello", "world", "-p"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, [], "Incorrect non-option parameters")
             XCTAssertEqual(2, options.count, "Parser \(parser) should have parsed \(params)")
             if let optParams = options[optionDescription] {
@@ -552,7 +552,7 @@ class OptionKitTests: XCTestCase {
         params = ["--hello", "world", "-p", "-n", "boo", "hoo"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, [], "Incorrect non-option parameters")
             XCTAssertEqual(3, options.count, "Parser \(parser) should have parsed \(params)")
             if let optParams = options[optionDescription] {
@@ -579,7 +579,7 @@ class OptionKitTests: XCTestCase {
         params = ["--hello", "world", "-p", "-n", "boo", "hoo", "rest"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, ["rest"], "Incorrect non-option parameters")
             XCTAssertEqual(3, options.count, "Parser \(parser) should have parsed \(params)")
             if let optParams = options[optionDescription] {
@@ -607,7 +607,7 @@ class OptionKitTests: XCTestCase {
         params = ["-p", "-n", "boo", "hoo", "rest", "--hello", "world"]
         switch parser.parse(params) {
         case .Success(let parseDataBox):
-            let (options, rest) = parseDataBox.value
+            let (options, rest) = parseDataBox.unbox
             XCTAssertEqual(rest, ["rest"], "Incorrect non-option parameters")
             XCTAssertEqual(3, options.count, "Parser \(parser) should have parsed \(params)")
             if let optParams = options[optionDescription] {

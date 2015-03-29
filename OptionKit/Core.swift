@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import LlamaKit
 
 /**
  Eventually intends to be a getopt-compatible option parser.
@@ -217,7 +218,7 @@ public struct OptionParser {
     /// :param: parameters the parameters passed to the command line utility.
     ///
     /// :returns: A result containing either a ParseData tuple, or the error encountered.
-    public func parse(parameters:[String]) -> Result<ParseData> {
+    public func parse(parameters:[String]) -> Result<ParseData, String> {
         let normalizedParams = OptionParser.normalizeParameters(parameters)
         let firstCall = ([OptionData](), [String]())
         return normalizedParams.reduce(success(firstCall)) { result, next in
@@ -233,7 +234,7 @@ public struct OptionParser {
                         
                         /* The option expects parameters; parameters cannot look like option triggers. */
                         if (Option.isValidOptionString(next)) {
-                            return .Failure("Option \(lastOpt) was not passed the required number of parameters before option \(next) was declared")
+                            return failure("Option \(lastOpt) was not passed the required number of parameters before option \(next) was declared")
                         }
                         
                         /* Sanity prevails, the next element is not an option trigger. */
@@ -261,7 +262,7 @@ public struct OptionParser {
                 if lastOpt.isValid {
                     return success((parsedOptions, args))
                 } else {
-                    return .Failure("Option \(lastOpt) is invalid")
+                    return failure("Option \(lastOpt) is invalid")
                 }
             }
             
@@ -276,7 +277,7 @@ public struct OptionParser {
         }
     }
     
-    private func parseNewFlagIntoResult(current:Result<([OptionData], [String])>, flagCandidate:String) -> Result<([OptionData], [String])> {
+    private func parseNewFlagIntoResult(current:Result<([OptionData], [String]), String>, flagCandidate:String) -> Result<([OptionData], [String]), String> {
         /* Does the next element want to be a flag? */
         if Option.isValidOptionString(flagCandidate) {
             for flag in self.definitions {
@@ -288,7 +289,7 @@ public struct OptionParser {
                 }
             }
             
-            return .Failure("Invalid option: \(flagCandidate)")
+            return failure("Invalid option: \(flagCandidate)")
         }
         
         return current.map { val in
