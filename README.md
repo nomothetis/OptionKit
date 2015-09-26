@@ -44,14 +44,14 @@ do {
     let (options, rest) = try parser.parse(actualArguments)
 
     if options[opt1] != nil {
-        println("\(rest)")
+        print("\(rest)")
     }
 
     if options[opt2] != nil {
-      println(parser.helpStringForCommandName("optionTest"))
+      print(parser.helpStringForCommandName("optionTest"))
     }
 } catch let OptionKitError.InvalidOption(description: description) {
-  println(description)
+  print(description)
 }
 ```
 
