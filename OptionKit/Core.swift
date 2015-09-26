@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import LlamaKit
 
 /**
  Eventually intends to be a getopt-compatible option parser.
@@ -189,7 +188,7 @@ public struct OptionParser {
         
         // The leading string, to properly indent.
         var leadingString = "       "
-        for i in 0..<commandName.characters.count {
+        for _ in 0..<commandName.characters.count {
             leadingString += " "
         }
         leadingString += " "
@@ -198,7 +197,7 @@ public struct OptionParser {
         return self.definitions.reduce(["usage: \(commandName)"]) { lines, optDef in
             let nextDescription = optDef.trigger.usageDescription
             let additionalCharacters = nextDescription.characters.count + 1 // +1 for the space
-            if (lines.last!).characters.count < 80 - additionalCharacters {
+            if (lines.last!).characters.count < maximumLineWidth - additionalCharacters {
                 return lines[0..<lines.count - 1] + [lines.last! + " " + nextDescription]
             }
             
@@ -218,83 +217,68 @@ public struct OptionParser {
     /// - parameter parameters: the parameters passed to the command line utility.
     ///
     /// - returns: A result containing either a ParseData tuple, or the error encountered.
-    public func parse(parameters:[String]) -> Result<ParseData, String> {
+    public func parse(parameters:[String]) throws -> ParseData {
         let normalizedParams = OptionParser.normalizeParameters(parameters)
         let firstCall = ([OptionData](), [String]())
-        return normalizedParams.reduce(success(firstCall)) { result, next in
-            
-            return result.flatMap {tuple in
-                
-                let (optArray, args) = tuple
-                /* First check if we are in the process of parsing an option with parameters. */
-                if let lastOpt = optArray.last {
-                    
-                    /* Since we have parsed an option already, let's check if it needs more parameters. */
-                    if lastOpt.option.numberOfParameters > lastOpt.parameters.count {
-                        
-                        /* The option expects parameters; parameters cannot look like option triggers. */
-                        if (Option.isValidOptionString(next)) {
-                            return failure("Option \(lastOpt) was not passed the required number of parameters before option \(next) was declared")
-                        }
-                        
-                        /* Sanity prevails, the next element is not an option trigger. */
-                        let shortOptArray = optArray[0 ..< optArray.count - 1]
-                        let newOption = OptionData(definition: lastOpt.option, parameters: lastOpt.parameters + [next])
-                        return success((shortOptArray + [newOption], args))
+
+        let (parsedOptions, args) = try normalizedParams.reduce(firstCall) { tuple, next in
+
+            let (optArray, args) = tuple
+            /* First check if we are in the process of parsing an option with parameters. */
+            if let lastOpt = optArray.last {
+
+                /* Since we have parsed an option already, let's check if it needs more parameters. */
+                if lastOpt.option.numberOfParameters > lastOpt.parameters.count {
+
+                    /* The option expects parameters; parameters cannot look like option triggers. */
+                    if (Option.isValidOptionString(next)) {
+                        throw OptionKitError.InvalidOption(description: "Option \(lastOpt) was not passed the required number of parameters before option \(next) was declared")
                     }
-                    
-                    /* No need for more parameters; parse the next option. */
-                    return self.parseNewFlagIntoResult(result, flagCandidate: next)
+
+                    /* Sanity prevails, the next element is not an option trigger. */
+                    let shortOptArray = optArray[0 ..< optArray.count - 1]
+                    let newOption = OptionData(definition: lastOpt.option, parameters: lastOpt.parameters + [next])
+                    return (shortOptArray + [newOption], args)
                 }
-                
-                /* This is the first option. Parse it! */
-                return self.parseNewFlagIntoResult(result, flagCandidate: next)
+
+                /* No need for more parameters; parse the next option. */
+                return try self.parseNewFlag(tuple, flagCandidate: next)
             }
-        }.flatMap { tuple in
-            
-            let (parsedOptions, args) = tuple
-            // We need to carry out one last check. Because of the way the above reduce works, it's
-            // possible the very last option is in fact not valid. There are ways around that, like
-            // having an array of results and then coalescing it into a single Result array if all
-            // are successes, but that's actually slower than just checking the last element at the
-            // end.
-            if let lastOpt = parsedOptions.last {
-                if lastOpt.isValid {
-                    return success((parsedOptions, args))
-                } else {
-                    return failure("Option \(lastOpt) is invalid")
-                }
-            }
-            
-            return success(tuple)
-        }.map { (tuple:([OptionData], [String])) -> ([Option:[String]], [String]) in
-            let (optionsArray, args) = tuple
-            var dict = [Option:[String]]()
-            for opt in optionsArray {
-                dict[opt.option] = opt.parameters
-            }
-            return (dict, args)
+
+            /* This is the first option. Parse it! */
+            return try self.parseNewFlag(tuple, flagCandidate: next)
         }
+
+        // We need to carry out one last check. Because of the way the above reduce works, it's
+        // possible the very last option is in fact not valid. There are ways around that, like
+        // having an array of results and then coalescing it into a single Result array if all
+        // are successes, but that's actually slower than just checking the last element at the
+        // end.
+        if let lastOpt = parsedOptions.last where !lastOpt.isValid {
+            throw OptionKitError.InvalidOption(description: "Option \(lastOpt) is invalid")
+        }
+
+        var dict = [Option:[String]]()
+        for opt in parsedOptions {
+            dict[opt.option] = opt.parameters
+        }
+        return (dict, args)
     }
-    
-    private func parseNewFlagIntoResult(current:Result<([OptionData], [String]), String>, flagCandidate:String) -> Result<([OptionData], [String]), String> {
+
+    private func parseNewFlag(current: ([OptionData], [String]), flagCandidate:String) throws -> ([OptionData], [String]) {
         /* Does the next element want to be a flag? */
         if Option.isValidOptionString(flagCandidate) {
             for flag in self.definitions {
                 if flag.matches(flagCandidate) {
                     let newOption = OptionData(definition: flag, parameters: [])
-                    return current.map { val in
-                        return (val.0 + [newOption], val.1)
-                    }
+                    return (current.0 + [newOption], current.1)
                 }
             }
             
-            return failure("Invalid option: \(flagCandidate)")
+            throw OptionKitError.InvalidOption(description: "Invalid option: \(flagCandidate)")
         }
         
-        return current.map { val in
-            return (val.0, val.1 + [flagCandidate])
-        }
+        return (current.0, current.1 + [flagCandidate])
     }
     
     static func normalizeParameters(parameters:[String]) -> [String] {
@@ -344,4 +328,9 @@ private func ==(lhs:OptionData, rhs:OptionData) -> Bool {
     return (lhs.option == rhs.option) && (lhs.parameters == rhs.parameters)
 }
 
+/// MARK: - Error types
+
+public enum OptionKitError: ErrorType {
+  case InvalidOption(description: String)
+}
 
