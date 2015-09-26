@@ -227,7 +227,8 @@ public struct OptionParser {
     ///
     /// - parameter parameters: the parameters passed to the command line utility.
     ///
-    /// - returns: A result containing either a ParseData tuple, or the error encountered.
+    /// - returns: A ParseData tuple
+    /// - throws: OptionKitError
     public func parse(parameters:[String]) throws -> ParseData {
         let normalizedParams = OptionParser.normalizeParameters(parameters)
         let firstCall = ([OptionData](), [String]())
@@ -261,10 +262,8 @@ public struct OptionParser {
         }
 
         // We need to carry out one last check. Because of the way the above reduce works, it's
-        // possible the very last option is in fact not valid. There are ways around that, like
-        // having an array of results and then coalescing it into a single Result array if all
-        // are successes, but that's actually slower than just checking the last element at the
-        // end.
+        // possible the very last option is in fact not valid. There are ways around that, but 
+        // that's actually slower than just checking the last element at the end.
         if let lastOpt = parsedOptions.last where !lastOpt.isValid {
             throw OptionKitError.InvalidOption(description: "Option \(lastOpt)")
         }
