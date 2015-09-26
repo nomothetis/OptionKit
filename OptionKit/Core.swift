@@ -13,7 +13,7 @@ import LlamaKit
  Eventually intends to be a getopt-compatible option parser.
  */
 
-public enum OptionTrigger : Equatable, DebugPrintable, Hashable {
+public enum OptionTrigger : Equatable, CustomDebugStringConvertible, Hashable {
     case Short(Character)
     case Long(String)
     case Mixed(Character, String)
@@ -56,7 +56,7 @@ public enum OptionTrigger : Equatable, DebugPrintable, Hashable {
 /// An Option consists of a trigger and a number of required parameters, which
 /// defaults to zero. It also has includes a description, which is empty by default. The
 /// description does not affect equality.
-public struct Option : Equatable, DebugPrintable, Hashable {
+public struct Option : Equatable, CustomDebugStringConvertible, Hashable {
     let trigger:OptionTrigger
     let numberOfParameters:Int
     
@@ -67,12 +67,12 @@ public struct Option : Equatable, DebugPrintable, Hashable {
     ///
     /// Creates an option definition from a trigger and a required number of parameters.
     ///
-    /// :param: trigger            the trigger that the parser will use to decide the option is
+    /// - parameter trigger:            the trigger that the parser will use to decide the option is
     ///                            being called.
-    /// :param: numberOfParameters the number of required parameters. Defaults to 0.
-    /// :param: helpDescription    the string that will be displayed when the -h flag is triggered.
+    /// - parameter numberOfParameters: the number of required parameters. Defaults to 0.
+    /// - parameter helpDescription:    the string that will be displayed when the -h flag is triggered.
     ///
-    /// :returns:                  An OptionDefinition suitable for use by an OptionParser
+    /// - returns:                  An OptionDefinition suitable for use by an OptionParser
     public init(trigger trig:OptionTrigger, numberOfParameters num:Int = 0, helpDescription desc:String = "") {
         self.trigger = trig
         self.numberOfParameters = num
@@ -81,8 +81,8 @@ public struct Option : Equatable, DebugPrintable, Hashable {
     
     /// Determines if the given string matches this trigger.
     ///
-    /// :param: str the string.
-    /// :returns: `true` if the string matches this option's trigger, `false` otherwise.
+    /// - parameter str: the string.
+    /// - returns: `true` if the string matches this option's trigger, `false` otherwise.
     func matches(str:String) -> Bool {
         switch self.trigger {
         case .Short(let char):
@@ -95,7 +95,7 @@ public struct Option : Equatable, DebugPrintable, Hashable {
     }
     
     static func isValidOptionString(str:String) -> Bool{
-        let length = count(str)
+        let length = str.characters.count
         if length < 2 {
             return false
         }
@@ -105,11 +105,11 @@ public struct Option : Equatable, DebugPrintable, Hashable {
                 return false
             }
             
-            return str[advance(str.startIndex, 1)] != "-"
+            return str[str.startIndex.advancedBy(1)] != "-"
         }
 
         /* Okay, count greater than 2. Full option! */
-        return str[str.startIndex ... advance(str.startIndex, 1)] == "--"
+        return str[str.startIndex ... str.startIndex.advancedBy(1)] == "--"
         
     }
     
@@ -126,7 +126,7 @@ public struct Option : Equatable, DebugPrintable, Hashable {
     }
 }
 
-private struct OptionData : Equatable, DebugPrintable {
+private struct OptionData : Equatable, CustomDebugStringConvertible {
     let option:Option
     let parameters:[String]
     
@@ -166,11 +166,11 @@ public struct OptionParser {
     /// By default, each parser has an option triggered by `-h` and `--help`. It also provides
     /// a console-displayable string of the options via the `helpStringForCommandName` method.
     ///
-    /// :param: definitions the option definitions to parse for.
-    /// :returns: a parser
+    /// - parameter definitions: the option definitions to parse for.
+    /// - returns: a parser
     public init(definitions defs:[Option] = []) {
         let helpOption = Option(trigger:.Mixed("h", "help"), helpDescription: "Display command help.")
-        if contains(defs, helpOption) {
+        if defs.contains(helpOption) {
             self.definitions = defs
         } else {
             self.definitions = defs + [helpOption]
@@ -182,14 +182,14 @@ public struct OptionParser {
     /// The string is suitable to be displayed on the command line and consists of multiple lines,
     /// all under 80 characters.
     ///
-    /// :param: commandName the name of the command.
-    /// :returns: an English-language string suitable for command-line display.
+    /// - parameter commandName: the name of the command.
+    /// - returns: an English-language string suitable for command-line display.
     public func helpStringForCommandName(commandName:String) -> String {
         let maximumLineWidth = 80
         
         // The leading string, to properly indent.
         var leadingString = "       "
-        for i in 0..<count(commandName) {
+        for i in 0..<commandName.characters.count {
             leadingString += " "
         }
         leadingString += " "
@@ -197,8 +197,8 @@ public struct OptionParser {
         // Now compute the string!
         return self.definitions.reduce(["usage: \(commandName)"]) { lines, optDef in
             let nextDescription = optDef.trigger.usageDescription
-            let additionalCharacters = count(nextDescription) + 1 // +1 for the space
-            if count(lines.last!) < 80 - additionalCharacters {
+            let additionalCharacters = nextDescription.characters.count + 1 // +1 for the space
+            if (lines.last!).characters.count < 80 - additionalCharacters {
                 return lines[0..<lines.count - 1] + [lines.last! + " " + nextDescription]
             }
             
@@ -215,9 +215,9 @@ public struct OptionParser {
     ///   - Option syntax ("-a", "--some-option") is reserved for options.
     ///   - The parameters of an option follow the option.
     ///
-    /// :param: parameters the parameters passed to the command line utility.
+    /// - parameter parameters: the parameters passed to the command line utility.
     ///
-    /// :returns: A result containing either a ParseData tuple, or the error encountered.
+    /// - returns: A result containing either a ParseData tuple, or the error encountered.
     public func parse(parameters:[String]) -> Result<ParseData, String> {
         let normalizedParams = OptionParser.normalizeParameters(parameters)
         let firstCall = ([OptionData](), [String]())
@@ -299,12 +299,12 @@ public struct OptionParser {
     
     static func normalizeParameters(parameters:[String]) -> [String] {
         return parameters.reduce([String]()) { memo, next in
-            let index = advance(next.startIndex, 0)
+            let index = next.startIndex.advancedBy(0)
             if next[index] != "-" {
                 return memo + [next]
             }
             
-            let secondIndex = advance(index, 1)
+            let secondIndex = index.advancedBy(1)
             if next[secondIndex] == "-" {
                 /* Assume everything that follows is valid. */
                 return memo + [next]
@@ -312,7 +312,7 @@ public struct OptionParser {
             
             /* Okay, we have one or more single-character flags. */
             var params = [String]()
-            for char in next[secondIndex..<advance(next.startIndex, 2)] {
+            for char in next[secondIndex..<next.startIndex.advancedBy(2)].characters {
                 params += ["-\(char)"]
             }
             
