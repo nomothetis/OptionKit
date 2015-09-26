@@ -55,7 +55,7 @@ public enum OptionTrigger : Equatable, CustomDebugStringConvertible, Hashable {
 /// An Option consists of a trigger and a number of required parameters, which
 /// defaults to zero. It also has includes a description, which is empty by default. The
 /// description does not affect equality.
-public struct Option : Equatable, CustomDebugStringConvertible, Hashable {
+public struct Option : Equatable, CustomStringConvertible, CustomDebugStringConvertible, Hashable {
     let trigger:OptionTrigger
     let numberOfParameters:Int
     
@@ -109,7 +109,12 @@ public struct Option : Equatable, CustomDebugStringConvertible, Hashable {
 
         /* Okay, count greater than 2. Full option! */
         return str[str.startIndex ... str.startIndex.advancedBy(1)] == "--"
-        
+    }
+
+    public var description: String {
+        get {
+            return "\(self.trigger) requires \(self.numberOfParameters) parameters"
+        }
     }
     
     public var debugDescription:String {
@@ -125,7 +130,7 @@ public struct Option : Equatable, CustomDebugStringConvertible, Hashable {
     }
 }
 
-private struct OptionData : Equatable, CustomDebugStringConvertible {
+private struct OptionData : Equatable, CustomStringConvertible, CustomDebugStringConvertible {
     let option:Option
     let parameters:[String]
     
@@ -139,10 +144,16 @@ private struct OptionData : Equatable, CustomDebugStringConvertible {
             return parameters.count == option.numberOfParameters
         }
     }
+
+    private var description: String {
+        get {
+            return "\(self.option), parameters \(parameters) are given"
+        }
+    }
     
     private var debugDescription:String {
         get {
-            return "{ OptionData:\n    \(self.option)\n     \(self.parameters)}"
+            return "{ OptionData:\n    \(self.option.debugDescription)\n     \(self.parameters)}"
         }
     }
 }
@@ -232,7 +243,7 @@ public struct OptionParser {
 
                     /* The option expects parameters; parameters cannot look like option triggers. */
                     if (Option.isValidOptionString(next)) {
-                        throw OptionKitError.InvalidOption(description: "Option \(lastOpt) was not passed the required number of parameters before option \(next) was declared")
+                        throw OptionKitError.InvalidOption(description: "Option \(lastOpt) before option \(next) was declared")
                     }
 
                     /* Sanity prevails, the next element is not an option trigger. */
@@ -255,7 +266,7 @@ public struct OptionParser {
         // are successes, but that's actually slower than just checking the last element at the
         // end.
         if let lastOpt = parsedOptions.last where !lastOpt.isValid {
-            throw OptionKitError.InvalidOption(description: "Option \(lastOpt) is invalid")
+            throw OptionKitError.InvalidOption(description: "Option \(lastOpt)")
         }
 
         var dict = [Option:[String]]()
