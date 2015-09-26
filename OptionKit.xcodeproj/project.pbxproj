@@ -41,7 +41,7 @@
 		7D50B47819D3A46600743806 /* OptionKitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OptionKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7D50B47E19D3A46600743806 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7D50B47F19D3A46600743806 /* CoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreTests.swift; sourceTree = "<group>"; };
-		7D50B48919D3A48500743806 /* Core.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = Core.swift; sourceTree = "<group>"; tabWidth = 4; };
+		7D50B48919D3A48500743806 /* Core.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Core.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
