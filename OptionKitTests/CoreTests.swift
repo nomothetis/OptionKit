@@ -494,13 +494,13 @@ class OptionKitTests: XCTestCase {
     
     
     func testMixOfParametersAndNoParameters() {
-        var optionDescription = Option(trigger:.Mixed("h", "hello"), numberOfParameters:1)
-        var optionDescription2 = Option(trigger:.Mixed("p", "pom"))
-        var optionDescription3 = Option(trigger:.Mixed("n", "nom"), numberOfParameters:2)
-        var parser = OptionParser(definitions:[optionDescription, optionDescription2, optionDescription3])
-        var expectedParameters1 = ["world"]
-        var expectedParameters2 = []
-        var expectedParameters3 = ["boo", "hoo"]
+        let optionDescription = Option(trigger:.Mixed("h", "hello"), numberOfParameters:1)
+        let optionDescription2 = Option(trigger:.Mixed("p", "pom"))
+        let optionDescription3 = Option(trigger:.Mixed("n", "nom"), numberOfParameters:2)
+        let parser = OptionParser(definitions:[optionDescription, optionDescription2, optionDescription3])
+        let expectedParameters1 = ["world"]
+        let expectedParameters2 = []
+        let expectedParameters3 = ["boo", "hoo"]
         
         var params = ["--hello", "world", "of"]
         do {
