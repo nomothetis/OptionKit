@@ -10,9 +10,6 @@
 		7D50B47919D3A46600743806 /* OptionKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7D50B46D19D3A46600743806 /* OptionKit.framework */; };
 		7D50B48019D3A46600743806 /* CoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D50B47F19D3A46600743806 /* CoreTests.swift */; };
 		7D50B48A19D3A48500743806 /* Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D50B48919D3A48500743806 /* Core.swift */; };
-		7DABE47D1AC777BB00D0017B /* LlamaKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DABE47C1AC777BB00D0017B /* LlamaKit.framework */; };
-		7DABE47E1AC7785700D0017B /* LlamaKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DABE47C1AC777BB00D0017B /* LlamaKit.framework */; };
-		7DABE4801AC7787100D0017B /* LlamaKit.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7DABE47C1AC777BB00D0017B /* LlamaKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -32,7 +29,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				7DABE4801AC7787100D0017B /* LlamaKit.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -46,7 +42,6 @@
 		7D50B47E19D3A46600743806 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7D50B47F19D3A46600743806 /* CoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreTests.swift; sourceTree = "<group>"; };
 		7D50B48919D3A48500743806 /* Core.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Core.swift; sourceTree = "<group>"; };
-		7DABE47C1AC777BB00D0017B /* LlamaKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LlamaKit.framework; path = Carthage/Build/Mac/LlamaKit.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,7 +49,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7DABE47D1AC777BB00D0017B /* LlamaKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -62,7 +56,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7DABE47E1AC7785700D0017B /* LlamaKit.framework in Frameworks */,
 				7D50B47919D3A46600743806 /* OptionKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -73,7 +66,6 @@
 		7D50B46319D3A46600743806 = {
 			isa = PBXGroup;
 			children = (
-				7DABE47C1AC777BB00D0017B /* LlamaKit.framework */,
 				7D50B46F19D3A46600743806 /* OptionKit */,
 				7D50B47C19D3A46600743806 /* OptionKitTests */,
 				7D50B46E19D3A46600743806 /* Products */,
@@ -180,7 +172,9 @@
 		7D50B46419D3A46600743806 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0610;
+				LastSwiftMigration = 0700;
+				LastSwiftUpdateCheck = 0700;
+				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = nomothetis;
 				TargetAttributes = {
 					7D50B46C19D3A46600743806 = {
@@ -274,6 +268,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -354,6 +349,7 @@
 				INFOPLIST_FILE = OptionKit/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.nomothetis.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -379,6 +375,7 @@
 				INFOPLIST_FILE = OptionKit/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.nomothetis.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				VALIDATE_PRODUCT = YES;
@@ -400,6 +397,7 @@
 				);
 				INFOPLIST_FILE = OptionKitTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.nomothetis.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -415,6 +413,7 @@
 				);
 				INFOPLIST_FILE = OptionKitTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.nomothetis.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

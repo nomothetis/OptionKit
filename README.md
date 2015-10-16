@@ -39,21 +39,19 @@ let opt5 = Option(trigger:.Mixed("c", "counterstrike"))
 let parser = OptionParser(definitions:[opt1, opt3, opt4, opt5])
 
 let actualArguments = Array(Process.arguments[1..<Process.arguments.count])
-let result = parser.parse(actualArguments)
 
-switch result {
-case .Success(let box):
-    let (options, rest) = box.value
+do {
+    let (options, rest) = try parser.parse(actualArguments)
+
     if options[opt1] != nil {
-        println("\(rest)")
+        print("\(rest)")
     }
 
     if options[opt2] != nil {
-      println(parser.helpStringForCommandName("optionTest"))
+      print(parser.helpStringForCommandName("optionTest"))
     }
-    
-case .Failure(let err):
-   println(err)
+} catch let OptionKitError.InvalidOption(description: description) {
+  print(description)
 }
 ```
 
@@ -80,7 +78,7 @@ Invalid option: -d
 
 Minimum system requirements:
 
-* Xcode 6.3β4
+* Xcode 7
 * OS X Yosemite 10.10
 
 Steps:
