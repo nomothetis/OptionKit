@@ -103,7 +103,7 @@ Use [Carthage](https://github.com/Carthage/Carthage). OptionKit uses semantic ve
 the corresponding Cartfile line should be:
 
 ```
-github "nomothetis/OptionKit" ~> 0.2.0
+github "nomothetis/OptionKit" ~> 1.0.0
 ```
 
 ### To Do
