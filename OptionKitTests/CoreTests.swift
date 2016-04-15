@@ -681,5 +681,24 @@ class OptionKitTests: XCTestCase {
             XCTFail("Parsing failed with unexpected error: \(error)")
         }
     }
-
+    
+    func testMultipleParametersAsOneArgument() {
+        let optionDescription = Option(trigger:.Mixed("p", "print"))
+        let optionDescription2 = Option(trigger:.Mixed("s", "sort"))
+        let optionDescription3 = Option(trigger:.Mixed("e", "exclude"), numberOfParameters:1)
+        let parser = OptionParser(definitions:[optionDescription, optionDescription2, optionDescription3])
+        let expectedParameters = ["something"]
+        
+        let params = ["-pse", "something"]
+        do {
+            let (options, rest) = try parser.parse(params)
+            XCTAssertEqual(rest.count, 0, "Incorrect number of parameters")
+            XCTAssertEqual(3, options.count, "Parser \(parser) should have parsed \(params)")
+            if let optParams3 = options[optionDescription3] {
+                XCTAssertEqual(optParams3, expectedParameters, "Incorrect parameters for \(optionDescription3)")
+            }
+        } catch {
+            XCTFail("Parsing should have succeeded for parser: \(parser), options: \(params)")
+        }
+    }
 }
