@@ -306,7 +306,7 @@ public struct OptionParser {
             
             /* Okay, we have one or more single-character flags. */
             var params = [String]()
-            for char in next[secondIndex..<next.startIndex.advancedBy(2)].characters {
+            for char in next[secondIndex..<next.endIndex].characters {
                 params += ["-\(char)"]
             }
             
