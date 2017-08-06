@@ -13,18 +13,18 @@ import Foundation
  */
 
 public enum OptionTrigger : Equatable, CustomDebugStringConvertible, Hashable {
-    case Short(Character)
-    case Long(String)
-    case Mixed(Character, String)
+    case short(Character)
+    case long(String)
+    case mixed(Character, String)
     
     public var debugDescription:String {
         get {
             switch self {
-            case .Short(let c):
+            case .short(let c):
                 return "-\(c)"
-            case .Long(let str):
+            case .long(let str):
                 return "--\(str)"
-            case .Mixed(let c, let str):
+            case .mixed(let c, let str):
                 return "[-\(c)|--\(str)]"
             }
         }
@@ -33,11 +33,11 @@ public enum OptionTrigger : Equatable, CustomDebugStringConvertible, Hashable {
     public var usageDescription:String {
         get {
             switch self {
-            case .Short(let c):
+            case .short(let c):
                 return "[-\(c)]"
-            case .Long(let str):
+            case .long(let str):
                 return "[--\(str)]"
-            case .Mixed(let c, let str):
+            case .mixed(let c, let str):
                 return "[-\(c)|--\(str)]"
             }
         }
@@ -82,18 +82,18 @@ public struct Option : Equatable, CustomStringConvertible, CustomDebugStringConv
     ///
     /// - parameter str: the string.
     /// - returns: `true` if the string matches this option's trigger, `false` otherwise.
-    func matches(str:String) -> Bool {
+    func matches(_ str:String) -> Bool {
         switch self.trigger {
-        case .Short(let char):
+        case .short(let char):
             return str == "-" + String(char)
-        case .Long(let longKey):
+        case .long(let longKey):
             return str == "--" + longKey
-        case .Mixed(let char, let longKey):
+        case .mixed(let char, let longKey):
             return (str == "--" + longKey) || str == "-" + String(char)
         }
     }
     
-    static func isValidOptionString(str:String) -> Bool{
+    static func isValidOptionString(_ str:String) -> Bool{
         let length = str.characters.count
         if length < 2 {
             return false
@@ -104,11 +104,11 @@ public struct Option : Equatable, CustomStringConvertible, CustomDebugStringConv
                 return false
             }
             
-            return str[str.startIndex.advancedBy(1)] != "-"
+            return str[str.characters.index(str.startIndex, offsetBy: 1)] != "-"
         }
 
         /* Okay, count greater than 2. Full option! */
-        return str[str.startIndex ... str.startIndex.advancedBy(1)] == "--"
+        return str[str.startIndex ... str.characters.index(str.startIndex, offsetBy: 1)] == "--"
     }
 
     public var description: String {
@@ -134,24 +134,24 @@ private struct OptionData : Equatable, CustomStringConvertible, CustomDebugStrin
     let option:Option
     let parameters:[String]
     
-    private init(definition def:Option, parameters params:[String] = []) {
+    fileprivate init(definition def:Option, parameters params:[String] = []) {
         self.option = def
         self.parameters = params
     }
     
-    private var isValid:Bool {
+    fileprivate var isValid:Bool {
         get {
             return parameters.count == option.numberOfParameters
         }
     }
 
-    private var description: String {
+    fileprivate var description: String {
         get {
             return "\(self.option), parameters \(parameters) are given"
         }
     }
     
-    private var debugDescription:String {
+    fileprivate var debugDescription:String {
         get {
             return "{ OptionData:\n    \(self.option.debugDescription)\n     \(self.parameters)}"
         }
@@ -179,7 +179,7 @@ public struct OptionParser {
     /// - parameter definitions: the option definitions to parse for.
     /// - returns: a parser
     public init(definitions defs:[Option] = []) {
-        let helpOption = Option(trigger:.Mixed("h", "help"), helpDescription: "Display command help.")
+        let helpOption = Option(trigger:.mixed("h", "help"), helpDescription: "Display command help.")
         if defs.contains(helpOption) {
             self.definitions = defs
         } else {
@@ -194,7 +194,7 @@ public struct OptionParser {
     ///
     /// - parameter commandName: the name of the command.
     /// - returns: an English-language string suitable for command-line display.
-    public func helpStringForCommandName(commandName:String) -> String {
+    public func helpStringForCommandName(_ commandName:String) -> String {
         let maximumLineWidth = 80
         
         // The leading string, to properly indent.
@@ -229,7 +229,7 @@ public struct OptionParser {
     ///
     /// - returns: A ParseData tuple
     /// - throws: OptionKitError
-    public func parse(parameters:[String]) throws -> ParseData {
+    public func parse(_ parameters:[String]) throws -> ParseData {
         let normalizedParams = OptionParser.normalizeParameters(parameters)
         let firstCall = ([OptionData](), [String]())
 
@@ -244,7 +244,7 @@ public struct OptionParser {
 
                     /* The option expects parameters; parameters cannot look like option triggers. */
                     if (Option.isValidOptionString(next)) {
-                        throw OptionKitError.InvalidOption(description: "Option \(lastOpt) before option \(next) was declared")
+                        throw OptionKitError.invalidOption(description: "Option \(lastOpt) before option \(next) was declared")
                     }
 
                     /* Sanity prevails, the next element is not an option trigger. */
@@ -264,8 +264,8 @@ public struct OptionParser {
         // We need to carry out one last check. Because of the way the above reduce works, it's
         // possible the very last option is in fact not valid. There are ways around that, but 
         // that's actually slower than just checking the last element at the end.
-        if let lastOpt = parsedOptions.last where !lastOpt.isValid {
-            throw OptionKitError.InvalidOption(description: "Option \(lastOpt)")
+        if let lastOpt = parsedOptions.last, !lastOpt.isValid {
+            throw OptionKitError.invalidOption(description: "Option \(lastOpt)")
         }
 
         var dict = [Option:[String]]()
@@ -275,7 +275,7 @@ public struct OptionParser {
         return (dict, args)
     }
 
-    private func parseNewFlag(current: ([OptionData], [String]), flagCandidate:String) throws -> ([OptionData], [String]) {
+    fileprivate func parseNewFlag(_ current: ([OptionData], [String]), flagCandidate:String) throws -> ([OptionData], [String]) {
         /* Does the next element want to be a flag? */
         if Option.isValidOptionString(flagCandidate) {
             for flag in self.definitions {
@@ -285,20 +285,20 @@ public struct OptionParser {
                 }
             }
             
-            throw OptionKitError.InvalidOption(description: "Invalid option: \(flagCandidate)")
+            throw OptionKitError.invalidOption(description: "Invalid option: \(flagCandidate)")
         }
         
         return (current.0, current.1 + [flagCandidate])
     }
     
-    static func normalizeParameters(parameters:[String]) -> [String] {
+    static func normalizeParameters(_ parameters:[String]) -> [String] {
         return parameters.reduce([String]()) { memo, next in
-            let index = next.startIndex.advancedBy(0)
+            let index = next.characters.index(next.startIndex, offsetBy: 0)
             if next[index] != "-" {
                 return memo + [next]
             }
             
-            let secondIndex = index.advancedBy(1)
+            let secondIndex = next.characters.index(index, offsetBy: 1)
             if next[secondIndex] == "-" {
                 /* Assume everything that follows is valid. */
                 return memo + [next]
@@ -306,7 +306,7 @@ public struct OptionParser {
             
             /* Okay, we have one or more single-character flags. */
             var params = [String]()
-            for char in next[secondIndex..<next.startIndex.advancedBy(2)].characters {
+            for char in next[secondIndex..<next.characters.index(next.startIndex, offsetBy: 2)].characters {
                 params += ["-\(char)"]
             }
             
@@ -319,11 +319,11 @@ public struct OptionParser {
 /// MARK: - Equatable
 public func ==(lhs:OptionTrigger, rhs:OptionTrigger) -> Bool {
     switch (lhs, rhs) {
-    case (.Short(let x), .Short(let y)):
+    case (.short(let x), .short(let y)):
             return x == y
-    case (.Long(let x), .Long(let y)):
+    case (.long(let x), .long(let y)):
         return x == y
-    case (.Mixed(let x1, let x2), .Mixed(let y1, let y2)):
+    case (.mixed(let x1, let x2), .mixed(let y1, let y2)):
         return (x1 == y1) && (x2 == y2)
     default:
         return false
@@ -340,7 +340,7 @@ private func ==(lhs:OptionData, rhs:OptionData) -> Bool {
 
 /// MARK: - Error types
 
-public enum OptionKitError: ErrorType {
-  case InvalidOption(description: String)
+public enum OptionKitError: Error {
+  case invalidOption(description: String)
 }
 
