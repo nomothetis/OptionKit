@@ -18,7 +18,7 @@ class OptionKitTests: XCTestCase {
         do {
             let opts = try parser.parse(["--hello"])
             XCTFail("Empty parser should process no options other than -h|--help; instead processed: \(opts)")
-        } catch let OptionKitError.InvalidOption(description: description) {
+        } catch let OptionKitError.invalidOption(description: description) {
             XCTAssertEqual(description, "Invalid option: --hello", "Incorrect error description")
         } catch {
             XCTFail("Parsing failed with unexpected error: \(error)")
@@ -27,7 +27,7 @@ class OptionKitTests: XCTestCase {
         do {
             let opts = try parser.parse(["-v"])
             XCTFail("Empty parser should process no options other than -h|--help; instead processed: \(opts)")
-        } catch let OptionKitError.InvalidOption(description: description) {
+        } catch let OptionKitError.invalidOption(description: description) {
             XCTAssertEqual(description, "Invalid option: -v", "Incorrect error description")
         } catch {
             XCTFail("Parsing failed with unexpected error: \(error)")
@@ -35,7 +35,7 @@ class OptionKitTests: XCTestCase {
     }
     
     func testParserWithNoParameterShortOption() {
-        let optionDescription = Option(trigger:.Short("h"))
+        let optionDescription = Option(trigger:.short("h"))
         let parser = OptionParser(definitions:[optionDescription])
         
         var params = ["h"]
@@ -60,7 +60,7 @@ class OptionKitTests: XCTestCase {
         do {
             try parser.parse(params)
             XCTFail("Parsing should not have succeeded for parser: \(parser), options:\(params)")
-        } catch let OptionKitError.InvalidOption(description: description) {
+        } catch let OptionKitError.invalidOption(description: description) {
             XCTAssertEqual(description, "Invalid option: -i", "Incorrect error description")
         } catch {
             XCTFail("Parsing failed with unexpected error: \(error)")
@@ -70,7 +70,7 @@ class OptionKitTests: XCTestCase {
         do {
             try parser.parse(params)
             XCTFail("Parsing should not have succeeded for parser: \(parser), options:\(params)")
-        } catch let OptionKitError.InvalidOption(description: description) {
+        } catch let OptionKitError.invalidOption(description: description) {
             XCTAssertEqual(description, "Invalid option: --bad-option", "Incorrect error description")
         } catch {
             XCTFail("Parsing failed with unexpected error: \(error)")
@@ -80,7 +80,7 @@ class OptionKitTests: XCTestCase {
         do {
             try parser.parse(params)
             XCTFail("Parsing should not have succeeded for parser: \(parser), options:\(params)")
-        } catch let OptionKitError.InvalidOption(description: description) {
+        } catch let OptionKitError.invalidOption(description: description) {
             XCTAssertEqual(description, "Invalid option: -n", "Incorrect error description")
         } catch {
             XCTFail("Parsing failed with unexpected error: \(error)")
@@ -119,14 +119,14 @@ class OptionKitTests: XCTestCase {
     }
 
     func testInvalidCallsOfNoParameterShortOption() {
-        let optionDescription = Option(trigger:.Short("h"))
+        let optionDescription = Option(trigger:.short("h"))
         let parser = OptionParser(definitions:[optionDescription])
         
         let params = ["--hello"]
         do {
             try parser.parse(params)
             XCTFail("Parsing should not have succeeded for parser: \(parser), options: \(params)")
-        } catch let OptionKitError.InvalidOption(description: description) {
+        } catch let OptionKitError.invalidOption(description: description) {
             XCTAssertEqual(description, "Invalid option: --hello", "Incorrect error description")
         } catch {
             XCTFail("Parsing failed with unexpected error: \(error)")
@@ -135,7 +135,7 @@ class OptionKitTests: XCTestCase {
     
 
     func testParserWithNoParameterLongOption() {
-        let optionDescription = Option(trigger:.Long("hello"))
+        let optionDescription = Option(trigger:.long("hello"))
         let parser = OptionParser(definitions:[optionDescription])
         
         var params = ["hello"]
@@ -161,7 +161,7 @@ class OptionKitTests: XCTestCase {
         do {
             try parser.parse(params)
             XCTFail("Parsing should not have succeeded for parser: \(parser), options:\(params)")
-        } catch let OptionKitError.InvalidOption(description: description) {
+        } catch let OptionKitError.invalidOption(description: description) {
             XCTAssertEqual(description, "Invalid option: -i", "Incorrect error description")
         } catch {
             XCTFail("Parsing failed with unexpected error: \(error)")
@@ -171,7 +171,7 @@ class OptionKitTests: XCTestCase {
         do {
             try parser.parse(params)
             XCTFail("Parsing should not have succeeded for parser: \(parser), options:\(params)")
-        } catch let OptionKitError.InvalidOption(description: description) {
+        } catch let OptionKitError.invalidOption(description: description) {
             XCTAssertEqual(description, "Invalid option: --bad-option", "Incorrect error description")
         } catch {
             XCTFail("Parsing failed with unexpected error: \(error)")
@@ -181,7 +181,7 @@ class OptionKitTests: XCTestCase {
         do {
             try parser.parse(params)
             XCTFail("Parsing should not have succeeded for parser: \(parser), options:\(params)")
-        } catch let OptionKitError.InvalidOption(description: description) {
+        } catch let OptionKitError.invalidOption(description: description) {
             XCTAssertEqual(description, "Invalid option: -n", "Incorrect error description")
         } catch {
             XCTFail("Parsing failed with unexpected error: \(error)")
@@ -220,14 +220,14 @@ class OptionKitTests: XCTestCase {
     }
 
     func testInvalidCallsOfNoParamterLongOption() {
-        let optionDescription = Option(trigger:.Long("vroom"), numberOfParameters:0)
+        let optionDescription = Option(trigger:.long("vroom"), numberOfParameters:0)
         let parser = OptionParser(definitions:[optionDescription])
         
         let params = ["-v"]
         do {
             try parser.parse(params)
             XCTFail("Parsing should not have succeeded for parser: \(parser), options:\(params)")
-        } catch let OptionKitError.InvalidOption(description: description) {
+        } catch let OptionKitError.invalidOption(description: description) {
             XCTAssertEqual(description, "Invalid option: -v", "Incorrect error description")
         } catch {
             XCTFail("Parsing failed with unexpected error: \(error)")
@@ -235,7 +235,7 @@ class OptionKitTests: XCTestCase {
     }
     
     func testParserWithNoParameterMixedOption() {
-        let optionDescription = Option(trigger:.Mixed("h", "hello"))
+        let optionDescription = Option(trigger:.mixed("h", "hello"))
         let parser = OptionParser(definitions:[optionDescription])
         
         var params = ["h"]
@@ -261,7 +261,7 @@ class OptionKitTests: XCTestCase {
         do {
             try parser.parse(params)
             XCTFail("Parsing should not have succeeded for parser: \(parser), options:\(params)")
-        } catch let OptionKitError.InvalidOption(description: description) {
+        } catch let OptionKitError.invalidOption(description: description) {
             XCTAssertEqual(description, "Invalid option: -i", "Incorrect error description")
         } catch {
             XCTFail("Parsing failed with unexpected error: \(error)")
@@ -271,7 +271,7 @@ class OptionKitTests: XCTestCase {
         do {
             try parser.parse(params)
             XCTFail("Parsing should not have succeeded for parser: \(parser), options:\(params)")
-        } catch let OptionKitError.InvalidOption(description: description) {
+        } catch let OptionKitError.invalidOption(description: description) {
             XCTAssertEqual(description, "Invalid option: --bad-option", "Incorrect error description")
         } catch {
             XCTFail("Parsing failed with unexpected error: \(error)")
@@ -281,7 +281,7 @@ class OptionKitTests: XCTestCase {
         do {
             try parser.parse(params)
             XCTFail("Parsing should not have succeeded for parser: \(parser), options:\(params)")
-        } catch let OptionKitError.InvalidOption(description: description) {
+        } catch let OptionKitError.invalidOption(description: description) {
             XCTAssertEqual(description, "Invalid option: -n", "Incorrect error description")
         } catch {
             XCTFail("Parsing failed with unexpected error: \(error)")
@@ -334,7 +334,7 @@ class OptionKitTests: XCTestCase {
         do {
             try parser.parse(params)
             XCTFail("Parsing should not have succeeded for parser: \(parser), options:\(params)")
-        } catch let OptionKitError.InvalidOption(description: description) {
+        } catch let OptionKitError.invalidOption(description: description) {
             XCTAssertEqual(description, "Invalid option: --bad-option", "Incorrect error description")
         } catch {
             XCTFail("Parsing failed with unexpected error: \(error)")
@@ -344,7 +344,7 @@ class OptionKitTests: XCTestCase {
         do {
             try parser.parse(params)
             XCTFail("Parsing should not have succeeded for parser: \(parser), options:\(params)")
-        } catch let OptionKitError.InvalidOption(description: description) {
+        } catch let OptionKitError.invalidOption(description: description) {
             XCTAssertEqual(description, "Invalid option: -n", "Incorrect error description")
         } catch {
             XCTFail("Parsing failed with unexpected error: \(error)")
@@ -384,7 +384,7 @@ class OptionKitTests: XCTestCase {
 
     func testOptionWithParameters() {
         // One parameter.
-        var optionDescription = Option(trigger:.Mixed("h", "hello"), numberOfParameters:1)
+        var optionDescription = Option(trigger:.mixed("h", "hello"), numberOfParameters:1)
         var parser = OptionParser(definitions:[optionDescription])
         
         var params = ["-h", "world"]
@@ -411,7 +411,7 @@ class OptionKitTests: XCTestCase {
         do {
             try parser.parse(params)
             XCTFail("Parsing should not have succeeded for parser: \(parser), options:\(params)")
-        } catch let OptionKitError.InvalidOption(description: description) {
+        } catch let OptionKitError.invalidOption(description: description) {
             XCTAssertEqual(description, "Option [-h|--hello] requires 1 parameters, parameters [] are given", "Incorrect error description")
         } catch {
             XCTFail("Parsing failed with unexpected error: \(error)")
@@ -421,7 +421,7 @@ class OptionKitTests: XCTestCase {
         do {
             try parser.parse(params)
             XCTFail("Parsing should not have succeeded for parser: \(parser), options:\(params)")
-        } catch let OptionKitError.InvalidOption(description: description) {
+        } catch let OptionKitError.invalidOption(description: description) {
             XCTAssertEqual(description, "Option [-h|--hello] requires 1 parameters, parameters [] are given before option --world was declared", "Incorrect error description")
         } catch {
             XCTFail("Parsing failed with unexpected error: \(error)")
@@ -431,14 +431,14 @@ class OptionKitTests: XCTestCase {
         do {
             try parser.parse(params)
             XCTFail("Parsing should not have succeeded for parser: \(parser), options:\(params)")
-        } catch let OptionKitError.InvalidOption(description: description) {
+        } catch let OptionKitError.invalidOption(description: description) {
             XCTAssertEqual(description, "Option [-h|--hello] requires 1 parameters, parameters [] are given before option -w was declared", "Incorrect error description")
         } catch {
             XCTFail("Parsing failed with unexpected error: \(error)")
         }
         
         
-        optionDescription = Option(trigger:.Mixed("h", "hello"), numberOfParameters:3)
+        optionDescription = Option(trigger:.mixed("h", "hello"), numberOfParameters:3)
         parser = OptionParser(definitions:[optionDescription])
         
         params = ["-h", "world", "of", "coke"]
@@ -465,7 +465,7 @@ class OptionKitTests: XCTestCase {
         do {
             try parser.parse(params)
             XCTFail("Parsing should not have succeeded for parser: \(parser), options:\(params)")
-        } catch let OptionKitError.InvalidOption(description: description) {
+        } catch let OptionKitError.invalidOption(description: description) {
             XCTAssertEqual(description, "Option [-h|--hello] requires 3 parameters, parameters [] are given", "Incorrect error description")
         } catch {
             XCTFail("Parsing failed with unexpected error: \(error)")
@@ -475,7 +475,7 @@ class OptionKitTests: XCTestCase {
         do {
             try parser.parse(params)
             XCTFail("Parsing should not have succeeded for parser: \(parser), options:\(params)")
-        } catch let OptionKitError.InvalidOption(description: description) {
+        } catch let OptionKitError.invalidOption(description: description) {
             XCTAssertEqual(description, "Option [-h|--hello] requires 3 parameters, parameters [\"world\"] are given", "Incorrect error description")
         } catch {
             XCTFail("Parsing failed with unexpected error: \(error)")
@@ -485,7 +485,7 @@ class OptionKitTests: XCTestCase {
         do {
             try parser.parse(params)
             XCTFail("Parsing should not have succeeded for parser: \(parser), options:\(params)")
-        } catch let OptionKitError.InvalidOption(description: description) {
+        } catch let OptionKitError.invalidOption(description: description) {
             XCTAssertEqual(description, "Option [-h|--hello] requires 3 parameters, parameters [\"world\", \"of\"] are given", "Incorrect error description")
         } catch {
             XCTFail("Parsing failed with unexpected error: \(error)")
@@ -494,12 +494,12 @@ class OptionKitTests: XCTestCase {
     
     
     func testMixOfParametersAndNoParameters() {
-        let optionDescription = Option(trigger:.Mixed("h", "hello"), numberOfParameters:1)
-        let optionDescription2 = Option(trigger:.Mixed("p", "pom"))
-        let optionDescription3 = Option(trigger:.Mixed("n", "nom"), numberOfParameters:2)
+        let optionDescription = Option(trigger:.mixed("h", "hello"), numberOfParameters:1)
+        let optionDescription2 = Option(trigger:.mixed("p", "pom"))
+        let optionDescription3 = Option(trigger:.mixed("n", "nom"), numberOfParameters:2)
         let parser = OptionParser(definitions:[optionDescription, optionDescription2, optionDescription3])
         let expectedParameters1 = ["world"]
-        let expectedParameters2 = []
+        let expectedParameters2 = [String]()
         let expectedParameters3 = ["boo", "hoo"]
         
         var params = ["--hello", "world", "of"]
@@ -655,7 +655,7 @@ class OptionKitTests: XCTestCase {
         do {
             try parser.parse(params)
             XCTFail("Parsing should not have succeeded for parser: \(parser), options:\(params)")
-        } catch let OptionKitError.InvalidOption(description: description) {
+        } catch let OptionKitError.invalidOption(description: description) {
             XCTAssertEqual(description, "Option [-n|--nom] requires 2 parameters, parameters [\"boo\"] are given before option --hello was declared", "Incorrect error description")
         } catch {
             XCTFail("Parsing failed with unexpected error: \(error)")
@@ -665,7 +665,7 @@ class OptionKitTests: XCTestCase {
         do {
             try parser.parse(params)
             XCTFail("Parsing should not have succeeded for parser: \(parser), options:\(params)")
-        } catch let OptionKitError.InvalidOption(description: description) {
+        } catch let OptionKitError.invalidOption(description: description) {
             XCTAssertEqual(description, "Option [-n|--nom] requires 2 parameters, parameters [\"boo\"] are given before option --hello was declared", "Incorrect error description")
         } catch {
             XCTFail("Parsing failed with unexpected error: \(error)")
@@ -675,7 +675,7 @@ class OptionKitTests: XCTestCase {
         do {
             try parser.parse(params)
             XCTFail("Parsing should not have succeeded for parser: \(parser), options:\(params)")
-        } catch let OptionKitError.InvalidOption(description: description) {
+        } catch let OptionKitError.invalidOption(description: description) {
             XCTAssertEqual(description, "Option [-h|--hello] requires 1 parameters, parameters [] are given", "Incorrect error description")
         } catch {
             XCTFail("Parsing failed with unexpected error: \(error)")
